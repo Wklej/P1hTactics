@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import reactor.core.publisher.Mono;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,17 +17,20 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/api/register")
-    public Mono<ResponseEntity<ApiResponse>> register(@RequestBody SummonerRegistrationRequest newSummoner) {
+    public ResponseEntity<ApiResponse> register(@RequestBody SummonerRegistrationRequest newSummoner) {
         //TODO: check for existence
 //            var userExist = userService.isUsernameTaken(newUser.username());
 //            if (userExist) {
 //                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already taken.");
 //            }
-        return userService.registerSummoner(newSummoner)
-                .map(createdSummoner -> ResponseEntity.status(HttpStatus.CREATED)
-                        .body(new ApiResponse(createdSummoner, null)))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ApiResponse(null, e.getMessage()))));
+        try {
+            var createdSummoner = userService.registerSummoner(newSummoner);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiResponse(createdSummoner, null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(null, e.getMessage()));
+        }
     }
 
 }
