@@ -25,6 +25,6 @@ public class RiotApiController {
 
     @GetMapping("/history/avg/{gameName}/{tagLine}")
     public double getAvgPlacement(@PathVariable String gameName, @PathVariable String tagLine) {
-        return riotApiService.getAvgPlacement(gameName, tagLine);
+        return riotApiService.getAvgPlacement(gameName, tagLine, "1100");
     }
 }

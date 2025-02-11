@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.repository.MatchRepository;
 import com.p1h.p1htactics.repository.UserRepository;
 import com.p1h.p1htactics.util.WebClientProxy;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -51,30 +53,20 @@ public class RiotApiService {
         }
     }
 
-    public double getAvgPlacement(String gameName, String tagLine) {
+    public double getAvgPlacement(String gameName, String tagLine, String gameMode) {
         var summoner = userRepository.findSummonerByGameNameAndTag(gameName, tagLine).orElseThrow();
         var matchHistory = summoner.getMatchHistory();
 
-        return matchHistory.stream()
-                .mapToDouble(matchId -> {
-                    try {
-                        var details = getMatchDetails(matchId);
-                        var jsonNode = objectMapper.readTree(details);
-                        var participantsNode = jsonNode.get("info").get("participants");
-                        return findParticipantByPuuId(participantsNode, summoner.getPuuid())
-                                .map(p -> p.get("placement").asInt())
-                                .orElseThrow();
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException("Error while processing JSON: ", e);
-                    }
-                })
+        var average = matchHistory.stream()
+                .map(matchId -> getPlacementIfMatchMode(matchId, gameMode, summoner))
+                .flatMapToInt(optional -> optional.map(IntStream::of)
+                        .orElseGet(IntStream::empty))
                 .average()
-                .stream()
-                .map(avg -> BigDecimal.valueOf(avg)
-                        .setScale(2, RoundingMode.HALF_UP)
-                        .doubleValue())
-                .findFirst()
                 .orElse(0.0);
+
+        return BigDecimal.valueOf(average)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     private String getMatchDetails(String matchId) {
@@ -85,5 +77,22 @@ public class RiotApiService {
         return StreamSupport.stream(participantsNode.spliterator(), false)
                 .filter(p -> p.has("puuid") && p.get("puuid").asText().equals(puuId))
                 .findFirst();
+    }
+
+    private Optional<Integer> getPlacementIfMatchMode(String matchId, String gameMode, Summoner summoner) {
+        try {
+            String details = getMatchDetails(matchId);
+            var jsonInfoNode = objectMapper.readTree(details).get("info");
+            var gameModeNode = jsonInfoNode.get("queueId");
+            if (gameModeNode != null && gameModeNode.asText().equals(gameMode)) {
+                var participantsNode = jsonInfoNode.get("participants");
+                return findParticipantByPuuId(participantsNode, summoner.getPuuid())
+                        .map(p -> p.get("placement").asInt());
+            } else {
+                return Optional.empty();
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error while processing JSON for match " + matchId, e);
+        }
     }
 }
