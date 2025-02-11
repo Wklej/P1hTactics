@@ -23,8 +23,10 @@ public class RiotApiController {
         return riotApiService.getMatchHistoryByPuuId(puuid, count);
     }
 
-    @GetMapping("/history/avg/{gameName}/{tagLine}")
-    public double getAvgPlacement(@PathVariable String gameName, @PathVariable String tagLine) {
-        return riotApiService.getAvgPlacement(gameName, tagLine, "1100");
+    @GetMapping("/history/avg/{gameName}/{tagLine}/{gameMode}")
+    public double getAvgPlacement(@PathVariable String gameName,
+                                  @PathVariable String tagLine,
+                                  @PathVariable String gameMode) {
+        return riotApiService.getAvgPlacement(gameName, tagLine, gameMode);
     }
 }
