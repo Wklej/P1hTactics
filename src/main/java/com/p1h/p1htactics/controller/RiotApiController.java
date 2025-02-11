@@ -22,4 +22,9 @@ public class RiotApiController {
     public List<String> getMatchHistory(@PathVariable String puuid, @RequestParam(defaultValue = "1000") int count) {
         return riotApiService.getMatchHistoryByPuuId(puuid, count);
     }
+
+    @GetMapping("/history/avg/{gameName}/{tagLine}")
+    public double getAvgPlacement(@PathVariable String gameName, @PathVariable String tagLine) {
+        return riotApiService.getAvgPlacement(gameName, tagLine);
+    }
 }

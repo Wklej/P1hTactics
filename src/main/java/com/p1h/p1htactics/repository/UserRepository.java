@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends MongoRepository<Summoner, String> {
     Optional<Summoner> findByUsername(String username);
+
+    Optional<Summoner> findSummonerByGameNameAndTag(String gameName, String tag);
 }

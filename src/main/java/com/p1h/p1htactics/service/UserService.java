@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,10 @@ public class UserService implements UserDetailsService {
     public void saveSummoner(Summoner summoner) {
         summoner.setLastUpdated(LocalDateTime.now());
         userRepository.save(summoner);
+    }
+
+    public Optional<Summoner> getSummonerBy(String gameName, String tag) {
+        return userRepository.findSummonerByGameNameAndTag(gameName, tag);
     }
 
     private Summoner createSummoner(String username, String password, String gameName, String tag, String puuId, List<String> matchIds) {
