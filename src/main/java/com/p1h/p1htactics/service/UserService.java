@@ -49,6 +49,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findSummonerByGameNameAndTag(gameName, tag);
     }
 
+    public Optional<Summoner> getSummonerBy(String gameName) {
+        return userRepository.findSummonerByGameName(gameName);
+    }
+
     private Summoner createSummoner(String username, String password, String gameName, String tag, String puuId, List<String> matchIds) {
         var summoner = new Summoner(null, username, password, gameName, tag, puuId, null, matchIds, LocalDateTime.now());
 

@@ -1,16 +1,20 @@
 package com.p1h.p1htactics.controller;
 
 import com.p1h.p1htactics.dto.ApiResponse;
+import com.p1h.p1htactics.dto.SummonerDto;
 import com.p1h.p1htactics.dto.SummonerRegistrationRequest;
+import com.p1h.p1htactics.entity.Summoner;
+import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
 @RequiredArgsConstructor
 public class UserController {
 
@@ -31,6 +35,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(null, e.getMessage()));
         }
+    }
+
+    @GetMapping("/api/getUsers")
+    public List<SummonerDto> getUsers() {
+        return userService.getAllSummoners().stream()
+                .map(SummonerMapper::summonerToSummonerDto)
+                .toList();
+    }
+
+    @GetMapping("/api/getUser/{gameName}")
+    public SummonerDto getUser(@PathVariable String gameName) {
+        return userService.getSummonerBy(gameName)
+                .map(SummonerMapper::summonerToSummonerDto)
+                .orElseThrow();
     }
 
 }

@@ -1,10 +1,39 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>Average Placement Calculator</title>
+    <link rel="stylesheet" href="css/front.css">
+    <script src="js/main.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
 </head>
 <body>
-    <h1>INDEX PAGE</h1>
+<div class="container">
+    <h1>Average Placement Calculator</h1>
+    <div id="calcForm">
+        <div class="form-group">
+            <label for="userSelect">Select User:</label>
+            <select id="userSelect" required>
+                <option value="">-- Select User --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="modeSelect">Select Game Mode:</label>
+            <select id="modeSelect" required>
+<!--                <option value="all" selected>All</option>-->
+                <option value="1100" selected>Ranked</option>
+                <option value="1090">Normal</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="matchLimit">Limit of matches:</label>
+            <input type="number" id="matchLimit">
+        </div>
+        <button type="submit" onclick="calculateAverage()">Calculate Average</button>
+    </div>
+    <div id="result" class="result"></div>
+</div>
+
 </body>
 </html>

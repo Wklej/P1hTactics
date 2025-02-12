@@ -25,3 +25,33 @@ function registerUser() {
             document.getElementById('password').value = '';
         })
 }
+
+function getUsers() {
+    fetch(`http://localhost:${port}/api/getUsers`)
+        .then(res => res.json())
+        .then(users => appendUsers(users))
+}
+
+async function getUser(gameName) {
+    const response = await fetch(`http://localhost:${port}/api/getUser/${gameName}`)
+    return await response.json()
+}
+
+async function calculateAverage() {
+    const selectedUser = document.getElementById("userSelect").value
+    const gameMode = document.getElementById("modeSelect").value
+    const limit = document.getElementById("matchLimit").value
+    let user
+    try {
+        user = await getUser(selectedUser)
+        console.log(user)
+    } catch (e) {
+        throw new Error(e)
+    }
+
+    const url = `http://localhost:${port}/history/avg/${user.gameName}/${user.tag}/${gameMode}?limit=${encodeURIComponent(limit)}`
+    fetch(url)
+        .then(res => res.text())
+        .then(avg => showResult(avg))
+
+}
