@@ -26,7 +26,8 @@ public class RiotApiController {
     @GetMapping("/history/avg/{gameName}/{tagLine}/{gameMode}")
     public double getAvgPlacement(@PathVariable String gameName,
                                   @PathVariable String tagLine,
-                                  @PathVariable String gameMode) {
-        return riotApiService.getAvgPlacement(gameName, tagLine, gameMode);
+                                  @PathVariable String gameMode,
+                                  @RequestParam(defaultValue = "1000") int limit) {
+        return riotApiService.getAvgPlacement(gameName, tagLine, gameMode, limit);
     }
 }

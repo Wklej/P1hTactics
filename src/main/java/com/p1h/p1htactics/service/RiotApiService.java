@@ -53,9 +53,11 @@ public class RiotApiService {
         }
     }
 
-    public double getAvgPlacement(String gameName, String tagLine, String gameMode) {
+    public double getAvgPlacement(String gameName, String tagLine, String gameMode, int limit) {
         var summoner = userRepository.findSummonerByGameNameAndTag(gameName, tagLine).orElseThrow();
-        var matchHistory = summoner.getMatchHistory();
+        var matchHistory = summoner.getMatchHistory().stream()
+                .limit(limit)
+                .toList();
 
         var average = matchHistory.stream()
                 .map(matchId -> getPlacementIfMatchMode(matchId, gameMode, summoner))
