@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -55,14 +54,13 @@ public class RiotApiService {
 
     public double getAvgPlacement(String gameName, String tagLine, String gameMode, int limit) {
         var summoner = userRepository.findSummonerByGameNameAndTag(gameName, tagLine).orElseThrow();
-        var matchHistory = summoner.getMatchHistory().stream()
-                .limit(limit)
-                .toList();
+        var matchHistory = summoner.getMatchHistory();
 
         var average = matchHistory.stream()
                 .map(matchId -> getPlacementIfMatchMode(matchId, gameMode, summoner))
-                .flatMapToInt(optional -> optional.map(IntStream::of)
-                        .orElseGet(IntStream::empty))
+                .flatMap(Optional::stream)
+                .limit(limit)
+                .mapToInt(Integer::intValue)
                 .average()
                 .orElse(0.0);
 
