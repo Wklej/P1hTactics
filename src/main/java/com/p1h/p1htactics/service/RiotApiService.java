@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -55,6 +56,7 @@ public class RiotApiService {
     public double getAvgPlacement(String gameName, String tagLine, String gameMode, int limit) {
         var summoner = userRepository.findSummonerByGameNameAndTag(gameName, tagLine).orElseThrow();
         var matchHistory = summoner.getMatchHistory();
+        Collections.reverse(matchHistory);
 
         var average = matchHistory.stream()
                 .map(matchId -> getPlacementIfMatchMode(matchId, gameMode, summoner))

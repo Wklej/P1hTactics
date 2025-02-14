@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ public class UserService implements UserDetailsService {
     public Summoner registerSummoner(SummonerRegistrationRequest newSummoner) {
         var puuId = riotApiService.getPuuId(newSummoner.gameName(), newSummoner.riotTag());
         var matchHistory = riotApiService.getMatchHistoryByPuuId(puuId, defaultCount);
+        Collections.reverse(matchHistory);
         return createSummoner(
                 newSummoner.username(),
                 newSummoner.password(),
