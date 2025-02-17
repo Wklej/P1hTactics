@@ -55,3 +55,24 @@ async function calculateAverage() {
         .then(avg => showResult(avg))
 
 }
+
+function addFriend() {
+    const friendGameName = document.getElementById("friendGameName").value
+    const friendRiotTag = document.getElementById("friendRiotTag").value
+    const url = `http://localhost:${port}/api/register/friend`
+    const requestBody = {gameName: friendGameName, riotTag: friendRiotTag}
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-type': "application/json"
+        },
+        body: JSON.stringify(requestBody)
+    })
+        .then(res => res.json())
+        .then(data => console.log(data))
+        .then(() => {
+            document.getElementById('friendGameName').value = '';
+            document.getElementById('friendRiotTag').value = '';
+        })
+}

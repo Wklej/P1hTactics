@@ -15,4 +15,9 @@ public class HomeController {
     public String customLogin() {
         return "login";
     }
+
+    @GetMapping("/addFriend")
+    public String addFriend() {
+        return "addFriend";
+    }
 }
