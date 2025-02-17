@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Document("matches")
 @Data
 @AllArgsConstructor
@@ -14,4 +16,6 @@ public class Match {
     @Id String id;
     String matchId;
     String details;
+    LocalDateTime gameTime;
+    String summonerName;
 }
