@@ -10,41 +10,53 @@
 </head>
 <body>
 
-<div class="main-section">
-    <div class="container">
-        <h1>Average Placement Calculator</h1>
-        <div id="calcForm">
-            <div class="form-group">
-                <label for="userSelect">Select User:</label>
-                <select id="userSelect" required>
-                    <option value="">-- Select User --</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="modeSelect">Select Game Mode:</label>
-                <select id="modeSelect" required>
-    <!--                <option value="all" selected>All</option>-->
-                    <option value="1100" selected>Ranked</option>
-                    <option value="1090">Normal</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="matchLimit">Limit of matches:</label>
-                <input type="number" id="matchLimit">
-            </div>
-            <button type="submit" onclick="calculateAverage()">Calculate Average</button>
+    <div class="main-section">
+
+        <div class="tabs">
+            <button class="tab-button active" data-target="calculator-section">Average Calculator</button>
+            <button class="tab-button" data-target="event-section">Event</button>
         </div>
-        <div id="result" class="result"></div>
-    </div>
-</div>
 
-<div class="right-section">
-    <div class="friends-info" id="friendsInfo">
-        <h3>Friend list</h3>
-        <p>@friend</p>
-    </div>
-</div>
+        <div class="tab-content">
+            <div class="container" id="calculator-section">
+                <h1>Average Placement Calculator</h1>
+                <div id="calcForm">
+                    <div class="form-group">
+                        <label for="userSelect">Select User:</label>
+                        <select id="userSelect" required>
+                            <option value="">-- Select User --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modeSelect">Select Game Mode:</label>
+                        <select id="modeSelect" required>
+            <!--                <option value="all" selected>All</option>-->
+                            <option value="1100" selected>Ranked</option>
+                            <option value="1090">Normal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="matchLimit">Limit of matches:</label>
+                        <input type="number" id="matchLimit">
+                    </div>
+                    <button type="submit" onclick="calculateAverage()">Calculate Average</button>
+                </div>
+                <div id="result" class="result"></div>
+            </div>
+            <div class="container hidden" id="event-section">
+                <p>Some event</p>
+            </div>
+        </div>
 
+    </div>
+
+
+    <div class="right-section">
+        <div class="friends-info" id="friendsInfo">
+            <h3>Friend list</h3>
+            <p>@friend</p>
+        </div>
+    </div>
 
 </body>
 </html>
