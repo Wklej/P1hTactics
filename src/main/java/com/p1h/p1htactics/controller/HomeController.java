@@ -16,8 +16,13 @@ public class HomeController {
         return "login";
     }
 
-    @GetMapping("/addFriend")
-    public String addFriend() {
-        return "addFriend";
+    @GetMapping("/main")
+    public String mainPage() {
+        return "main";
+    }
+
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
     }
 }

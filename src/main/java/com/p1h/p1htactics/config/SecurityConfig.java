@@ -17,7 +17,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/register.html",
+                                "/",
+                                "/index.html",
+//                                "/register.html",
+//                                "/templates/register.html",
                                 "/css/**",
                                 "/js/**").permitAll()
                         .requestMatchers(
@@ -29,7 +32,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/main", true)
                         .permitAll()
                 )
                 .build();
