@@ -9,31 +9,42 @@
     <script src="js/ui.js"></script>
 </head>
 <body>
-<div class="container">
-    <h1>Average Placement Calculator</h1>
-    <div id="calcForm">
-        <div class="form-group">
-            <label for="userSelect">Select User:</label>
-            <select id="userSelect" required>
-                <option value="">-- Select User --</option>
-            </select>
+
+<div class="main-section">
+    <div class="container">
+        <h1>Average Placement Calculator</h1>
+        <div id="calcForm">
+            <div class="form-group">
+                <label for="userSelect">Select User:</label>
+                <select id="userSelect" required>
+                    <option value="">-- Select User --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="modeSelect">Select Game Mode:</label>
+                <select id="modeSelect" required>
+    <!--                <option value="all" selected>All</option>-->
+                    <option value="1100" selected>Ranked</option>
+                    <option value="1090">Normal</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="matchLimit">Limit of matches:</label>
+                <input type="number" id="matchLimit">
+            </div>
+            <button type="submit" onclick="calculateAverage()">Calculate Average</button>
         </div>
-        <div class="form-group">
-            <label for="modeSelect">Select Game Mode:</label>
-            <select id="modeSelect" required>
-<!--                <option value="all" selected>All</option>-->
-                <option value="1100" selected>Ranked</option>
-                <option value="1090">Normal</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="matchLimit">Limit of matches:</label>
-            <input type="number" id="matchLimit">
-        </div>
-        <button type="submit" onclick="calculateAverage()">Calculate Average</button>
+        <div id="result" class="result"></div>
     </div>
-    <div id="result" class="result"></div>
 </div>
+
+<div class="right-section">
+    <div class="friends-info" id="friendsInfo">
+        <h3>Friend list</h3>
+        <p>@friend</p>
+    </div>
+</div>
+
 
 </body>
 </html>

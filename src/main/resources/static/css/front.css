@@ -4,6 +4,8 @@ body {
     background: #f7f7f7;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
 }
 
 /* Container for the form */
@@ -67,4 +69,17 @@ button:hover {
     text-align: center;
     font-size: 18px;
     color: #333;
+}
+
+.left-section, .main-section, .right-section {
+    padding: 20px;
+}
+
+.main-section {
+    flex: 2;
+    margin-right: 20px;
+}
+
+.right-section {
+    flex: 1;
 }
