@@ -1,5 +1,6 @@
 package com.p1h.p1htactics.controller;
 
+import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.service.RiotApiService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +30,10 @@ public class RiotApiController {
                                   @PathVariable String gameMode,
                                   @RequestParam(defaultValue = "1000") int limit) {
         return riotApiService.getAvgPlacement(gameName, tagLine, gameMode, limit);
+    }
+
+    @GetMapping("/api/getRanking")
+    public List<SummonerRankingDto> getRanking() {
+        return riotApiService.getRankings();
     }
 }

@@ -76,3 +76,9 @@ function addFriend() {
             document.getElementById('friendRiotTag').value = '';
         })
 }
+
+function loadRanking() {
+    fetch(`http://localhost:${port}/api/getRanking`)
+        .then(res => res.json())
+        .then(ranking => createRanking(ranking))
+}

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.entity.Summoner;
+import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.MatchRepository;
 import com.p1h.p1htactics.repository.UserRepository;
 import com.p1h.p1htactics.util.WebClientProxy;
@@ -69,6 +71,18 @@ public class RiotApiService {
         return BigDecimal.valueOf(average)
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue();
+    }
+
+    public List<SummonerRankingDto> getRankings() {
+        var summoners = userRepository.findAll().stream()
+                .map(SummonerMapper::summonerToSummonerDto)
+                .toList();
+
+        return summoners.stream()
+                .map(summonerDto -> SummonerMapper.summonerDtoToSummonerRankingDto(
+                        summonerDto,
+                        getAvgPlacement(summonerDto.gameName(), summonerDto.tag(), "1100", 1000)))
+                .toList();
     }
 
     private String getMatchDetails(String matchId) {

@@ -135,3 +135,42 @@ button:hover {
 .hidden {
     display: none;
 }
+
+.ranking-table {
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+}
+
+.ranking-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+.ranking-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.ranking-row:last-child {
+    border-bottom: none;
+}
+
+.column-name {
+    flex: 1;
+    text-align: left;
+}
+
+.column-average {
+    flex: 1;
+    text-align: right;
+}

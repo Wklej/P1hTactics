@@ -15,6 +15,7 @@
         <div class="tabs">
             <button class="tab-button active" data-target="calculator-section">Average Calculator</button>
             <button class="tab-button" data-target="addFriend-section">Add friend</button>
+            <button class="tab-button" data-target="ranking-section">Ranking</button>
             <button class="tab-button" data-target="event-section">Event</button>
         </div>
 
@@ -54,6 +55,26 @@
                         <input type="text" id="friendRiotTag">
                     </div>
                     <button type="submit" onclick="addFriend()">Add friend</button>
+                </div>
+            </div>
+            <div class="container hidden" id="ranking-section">
+                <div class="ranking-table">
+                    <div class="ranking-header">
+                        <span class="column-name">Summoner</span>
+                        <span class="column-average">Average Placement</span>
+                    </div>
+                    <div class="ranking-row">
+                        <span class="column-name">Player1</span>
+                        <span class="column-average">3.2</span>
+                    </div>
+                    <div class="ranking-row">
+                        <span class="column-name">Player2</span>
+                        <span class="column-average">4.1</span>
+                    </div>
+                    <div class="ranking-row">
+                        <span class="column-name">Player3</span>
+                        <span class="column-average">2.8</span>
+                    </div>
                 </div>
             </div>
             <div class="container hidden" id="event-section">
