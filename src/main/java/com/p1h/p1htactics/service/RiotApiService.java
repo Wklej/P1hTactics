@@ -105,18 +105,22 @@ public class RiotApiService {
                             event.getStart(),
                             event.getEnd());
 
-                    double avgPlacement = validMatches.stream()
-                            .map(matchDetails -> getPlacementIfMatchModeWithDetails(matchDetails, "1100", summoner))
-                            .flatMap(Optional::stream)
-                            .mapToInt(Integer::intValue)
-                            .average()
-                            .orElse(0.0);
-
-                    int gamesCount = validMatches.size();
-
-                    return new ResultDto(summoner.getUsername(), avgPlacement, gamesCount);
+                    return SummonerMapper.summonerToResultDto(
+                            summoner,
+                            calculateAvgPlacementForEvent(summoner, validMatches),
+                            validMatches.size(),
+                            event);
                 })
                 .toList();
+    }
+
+    private double calculateAvgPlacementForEvent(Summoner summoner, List<String> validMatches) {
+        return validMatches.stream()
+                .map(matchDetails -> getPlacementIfMatchModeWithDetails(matchDetails, "1100", summoner))
+                .flatMap(Optional::stream)
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0.0);
     }
 
     private String getMatchDetails(String matchId) {

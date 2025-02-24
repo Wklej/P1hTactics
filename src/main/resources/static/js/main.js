@@ -2,6 +2,7 @@ function initPage() {
     tabsHandler()
     getUsers()
     loadRanking()
+    loadEvent()
 }
 
 function tabsHandler() {
