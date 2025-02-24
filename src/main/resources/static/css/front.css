@@ -165,12 +165,14 @@ button:hover {
     border-bottom: none;
 }
 
-.column-name {
-    flex: 1;
-    text-align: left;
-}
-
-.column-average {
+.column-item {
     flex: 1;
     text-align: right;
+}
+
+.event-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
 }
