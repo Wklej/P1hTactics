@@ -1,5 +1,6 @@
 package com.p1h.p1htactics.controller;
 
+import com.p1h.p1htactics.dto.ResultDto;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.service.RiotApiService;
 import lombok.AllArgsConstructor;
@@ -35,5 +36,10 @@ public class RiotApiController {
     @GetMapping("/api/getRanking")
     public List<SummonerRankingDto> getRanking() {
         return riotApiService.getRankings();
+    }
+
+    @GetMapping("/api/getEventResults")
+    public List<ResultDto> getEventResults(@RequestParam(defaultValue = "test") String eventTitle) {
+        return riotApiService.getEventResults(eventTitle);
     }
 }

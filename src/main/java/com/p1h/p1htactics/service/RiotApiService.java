@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.p1h.p1htactics.dto.ResultDto;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
+import com.p1h.p1htactics.entity.Match;
 import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.MatchRepository;
@@ -15,6 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +33,7 @@ public class RiotApiService {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
+    private final EventService eventService;
 
     public String getAccountByRiotId(String gameName, String tagLine) {
         var accountInfoUri = String.format("/riot/account/v1/accounts/by-riot-id/%s/%s", gameName, tagLine);
@@ -61,7 +67,7 @@ public class RiotApiService {
         Collections.reverse(matchHistory);
 
         var average = matchHistory.stream()
-                .map(matchId -> getPlacementIfMatchMode(matchId, gameMode, summoner))
+                .map(matchId -> getPlacementIfMatchModeWithMatchId(matchId, gameMode, summoner))
                 .flatMap(Optional::stream)
                 .limit(limit)
                 .mapToInt(Integer::intValue)
@@ -85,8 +91,44 @@ public class RiotApiService {
                 .toList();
     }
 
+    public List<ResultDto> getEventResults(String eventTitle) {
+        var event = eventService.getEvent(eventTitle);
+        var participants = eventService.getParticipants(eventTitle);
+        var signedSummoners = userRepository.findAll().stream()
+                .filter(summoner -> participants.contains(summoner.getUsername()))
+                .toList();
+
+        return signedSummoners.stream()
+                .map(summoner -> {
+                    var validMatches = getMatchDetailsBetweenTime(
+                            summoner.getMatchHistory(),
+                            event.getStart(),
+                            event.getEnd());
+
+                    double avgPlacement = validMatches.stream()
+                            .map(matchDetails -> getPlacementIfMatchModeWithDetails(matchDetails, "1100", summoner))
+                            .flatMap(Optional::stream)
+                            .mapToInt(Integer::intValue)
+                            .average()
+                            .orElse(0.0);
+
+                    int gamesCount = validMatches.size();
+
+                    return new ResultDto(summoner.getUsername(), avgPlacement, gamesCount);
+                })
+                .toList();
+    }
+
     private String getMatchDetails(String matchId) {
         return matchRepository.findMatchByMatchId(matchId).getDetails();
+    }
+
+    private List<String> getMatchDetailsBetweenTime(List<String> matchId, LocalDate start, LocalDate end) {
+        var eventStart = LocalDateTime.of(start, LocalTime.MIN);
+        var eventEnd = LocalDateTime.of(end, LocalTime.MIN);
+        return matchRepository.findByMatchIdInAndGameTimeBetween(matchId, eventStart, eventEnd).stream()
+                .map(Match::getDetails)
+                .toList();
     }
 
     private Optional<JsonNode> findParticipantByPuuId(JsonNode participantsNode, String puuId) {
@@ -95,20 +137,32 @@ public class RiotApiService {
                 .findFirst();
     }
 
-    private Optional<Integer> getPlacementIfMatchMode(String matchId, String gameMode, Summoner summoner) {
+    private Optional<Integer> getPlacementIfMatchModeWithMatchId(String matchId, String gameMode, Summoner summoner) {
         try {
             String details = getMatchDetails(matchId);
-            var jsonInfoNode = objectMapper.readTree(details).get("info");
-            var gameModeNode = jsonInfoNode.get("queueId");
-            if (gameModeNode != null && gameModeNode.asText().equals(gameMode)) {
-                var participantsNode = jsonInfoNode.get("participants");
-                return findParticipantByPuuId(participantsNode, summoner.getPuuid())
-                        .map(p -> p.get("placement").asInt());
-            } else {
-                return Optional.empty();
-            }
+            return getPlacement(gameMode, summoner, details);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error while processing JSON for match " + matchId, e);
+        }
+    }
+
+    private Optional<Integer> getPlacementIfMatchModeWithDetails(String details, String gameMode, Summoner summoner) {
+        try {
+            return getPlacement(gameMode, summoner, details);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error while processing JSON for match " + details, e);
+        }
+    }
+
+    private Optional<Integer> getPlacement(String gameMode, Summoner summoner, String details) throws JsonProcessingException {
+        var jsonInfoNode = objectMapper.readTree(details).get("info");
+        var gameModeNode = jsonInfoNode.get("queueId");
+        if (gameModeNode != null && gameModeNode.asText().equals(gameMode)) {
+            var participantsNode = jsonInfoNode.get("participants");
+            return findParticipantByPuuId(participantsNode, summoner.getPuuid())
+                    .map(p -> p.get("placement").asInt());
+        } else {
+            return Optional.empty();
         }
     }
 }
