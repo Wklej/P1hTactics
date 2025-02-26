@@ -38,8 +38,4 @@ public class RiotApiController {
         return riotApiService.getRankings();
     }
 
-    @GetMapping("/api/getEventResults")
-    public List<ResultDto> getEventResults(@RequestParam(defaultValue = "test") String eventTitle) {
-        return riotApiService.getEventResults(eventTitle);
-    }
 }

@@ -1,12 +1,16 @@
 package com.p1h.p1htactics.controller;
 
+import com.p1h.p1htactics.dto.ResultDto;
 import com.p1h.p1htactics.service.EventService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -29,5 +33,10 @@ public class EventController {
     @GetMapping("/event/addParticipant/{title}/{username}")
     public void addParticipant(@PathVariable String title, @PathVariable String username) {
         eventService.addParticipantToEvent(title, username);
+    }
+
+    @GetMapping("/api/getEventResults")
+    public List<ResultDto> getEventResults(@RequestParam(defaultValue = "test") String eventTitle) {
+        return eventService.getEventResults(eventTitle);
     }
 }
