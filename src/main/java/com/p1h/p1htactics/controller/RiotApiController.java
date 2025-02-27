@@ -1,6 +1,5 @@
 package com.p1h.p1htactics.controller;
 
-import com.p1h.p1htactics.dto.ResultDto;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.service.RiotApiService;
 import lombok.AllArgsConstructor;

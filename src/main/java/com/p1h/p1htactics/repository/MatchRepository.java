@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface MatchRepository extends MongoRepository<Match, String> {
 
-    Match findMatchByMatchId(String matchId);
+    Match findFirstByMatchId(String matchId);
     List<Match> findByMatchIdInAndGameTimeBetween(List<String> matchId, LocalDateTime start, LocalDateTime end);
 }

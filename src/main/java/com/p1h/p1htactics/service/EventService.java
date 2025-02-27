@@ -1,7 +1,10 @@
 package com.p1h.p1htactics.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.p1h.p1htactics.dto.ResultDto;
+import com.p1h.p1htactics.dto.EventData;
+import com.p1h.p1htactics.dto.EventDto;
+import com.p1h.p1htactics.dto.PlacementCountDto;
+import com.p1h.p1htactics.dto.SummonerAvgEventResult;
 import com.p1h.p1htactics.entity.Event;
 import com.p1h.p1htactics.entity.Match;
 import com.p1h.p1htactics.entity.Summoner;
@@ -15,9 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -53,18 +54,30 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    /*
-    getEventResults(title/type) {
-        switch (title/type) {
-            case "rank avg":  getRankAvgEventResults(title/type)
-            case "topBottom": getTopBottomEventResults(title/type)
+    public Map<String, EventData> getAllEventResults() {
+        var events = eventRepository.findAll();
+        var eventsMap = new HashMap<String, EventData>();
+
+        for (var event : events) {
+            var title = event.getTitle();
+            List<SummonerAvgEventResult> avgList = null;
+            List<PlacementCountDto> placementList = null;
+
+            if ("AVG".equalsIgnoreCase(title)) {
+                avgList = getAvgEventResults(title);
+            } else if ("PLACEMENT".equalsIgnoreCase(title)) {
+                placementList = getPlacementCountsForEvent(title);
+            } else if ("TEST".equalsIgnoreCase(title)) {
+                avgList = getAvgEventResults(title);
+            }
+
+            eventsMap.put(title, new EventData(avgList, placementList));
         }
+
+        return eventsMap;
     }
 
-    scale to multiple event stats return (map?)
-     */
-
-    public List<ResultDto> getEventResults(String eventTitle) {
+    private List<SummonerAvgEventResult> getAvgEventResults(String eventTitle) {
         var event = this.getEvent(eventTitle);
         var participants = this.getParticipants(eventTitle);
         var signedSummoners = userRepository.findAll().stream()
@@ -78,11 +91,42 @@ public class EventService {
                             event.getStart(),
                             event.getEnd());
 
+                    var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
+
                     return SummonerMapper.summonerToResultDto(
                             summoner,
-                            calculateAvgPlacementForEvent(summoner, validMatches),
-                            validMatches.size(),
+                            calculateAvgPlacementForEvent(validRankedPlacements),
+                            validRankedPlacements.size(),
                             event);
+                })
+                .toList();
+    }
+
+    public List<PlacementCountDto> getPlacementCountsForEvent(String eventTitle) {
+        var event = this.getEvent(eventTitle);
+        var participants = getParticipants(eventTitle);
+        var signedSummoners = userRepository.findAll().stream()
+                .filter(summoner -> participants.contains(summoner.getUsername()))
+                .toList();
+
+        return signedSummoners.stream()
+                .map(summoner -> {
+                    var validMatches = getMatchDetailsBetweenTime(
+                            summoner.getMatchHistory(),
+                            event.getStart(),
+                            event.getEnd()
+                    );
+
+                    var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
+                    long topPlacementCount = getTopPlacementCount(validRankedPlacements);
+                    long bottomPlacementCount = getBottomPlacementCount(validRankedPlacements);
+
+                    return new PlacementCountDto(
+                            summoner.getUsername(),
+                            topPlacementCount,
+                            bottomPlacementCount,
+                            validRankedPlacements.size(),
+                            new EventDto(event.getTitle(), event.getStart(), event.getEnd()));
                 })
                 .toList();
     }
@@ -95,10 +139,29 @@ public class EventService {
                 .toList();
     }
 
-    private double calculateAvgPlacementForEvent(Summoner summoner, List<String> validMatches) {
+    private List<Integer> getValidRankedPlacements(List<String> validMatches, Summoner summoner) {
         return validMatches.stream()
-                .map(matchDetails -> getPlacementIfMatchModeWithDetails(matchDetails, "1100", summoner))
+                .map(details -> getPlacementIfMatchModeWithDetails(details, "1100", summoner))
                 .flatMap(Optional::stream)
+                .toList();
+    }
+
+    private long getBottomPlacementCount(List<Integer> validRankedPlacements) {
+        return validRankedPlacements.stream()
+                .mapToInt(Integer::intValue)
+                .filter(this::isBottom)
+                .count();
+    }
+
+    private long getTopPlacementCount(List<Integer> validRankedPlacements) {
+        return validRankedPlacements.stream()
+                .mapToInt(Integer::intValue)
+                .filter(this::isTop)
+                .count();
+    }
+
+    private double calculateAvgPlacementForEvent(List<Integer> validRankedPlacements) {
+        return validRankedPlacements.stream()
                 .mapToInt(Integer::intValue)
                 .average()
                 .orElse(0.0);
@@ -110,5 +173,13 @@ public class EventService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error while processing JSON for match " + details, e);
         }
+    }
+
+    private boolean isBottom(int placement) {
+        return placement == 1 || placement == 2 || placement == 3;
+    }
+
+    private boolean isTop(int placement) {
+        return placement == 8 || placement == 7 || placement == 6;
     }
 }

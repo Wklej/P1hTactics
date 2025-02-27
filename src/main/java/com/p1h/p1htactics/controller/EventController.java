@@ -1,6 +1,7 @@
 package com.p1h.p1htactics.controller;
 
-import com.p1h.p1htactics.dto.ResultDto;
+import com.p1h.p1htactics.dto.EventData;
+import com.p1h.p1htactics.dto.SummonerAvgEventResult;
 import com.p1h.p1htactics.service.EventService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -36,7 +38,7 @@ public class EventController {
     }
 
     @GetMapping("/api/getEventResults")
-    public List<ResultDto> getEventResults(@RequestParam(defaultValue = "test") String eventTitle) {
-        return eventService.getEventResults(eventTitle);
+    public Map<String, EventData> getEventResults() {
+        return eventService.getAllEventResults();
     }
 }

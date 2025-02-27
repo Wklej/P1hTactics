@@ -1,7 +1,7 @@
 package com.p1h.p1htactics.mapper;
 
 import com.p1h.p1htactics.dto.EventDto;
-import com.p1h.p1htactics.dto.ResultDto;
+import com.p1h.p1htactics.dto.SummonerAvgEventResult;
 import com.p1h.p1htactics.dto.SummonerDto;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.entity.Event;
@@ -17,8 +17,8 @@ public class SummonerMapper {
         return new SummonerRankingDto(summonerDto.gameName(), avg);
     }
 
-    public static ResultDto summonerToResultDto(Summoner summoner, double avg, int gamesCount, Event event) {
-        return new ResultDto(
+    public static SummonerAvgEventResult summonerToResultDto(Summoner summoner, double avg, int gamesCount, Event event) {
+        return new SummonerAvgEventResult(
                 summoner.getUsername(),
                 avg,
                 gamesCount,

@@ -98,7 +98,7 @@ public class RiotApiService {
     }
 
     private String getMatchDetails(String matchId) {
-        return matchRepository.findMatchByMatchId(matchId).getDetails();
+        return matchRepository.findFirstByMatchId(matchId).getDetails();
     }
 
     private Optional<JsonNode> findParticipantByPuuId(JsonNode participantsNode, String puuId) {

@@ -1,6 +1,6 @@
 package com.p1h.p1htactics.entity;
 
-import com.p1h.p1htactics.dto.ResultDto;
+import com.p1h.p1htactics.dto.SummonerAvgEventResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +20,6 @@ public class Event {
     LocalDate start;
     LocalDate end;
     List<String> participants;
-    List<ResultDto> finalResults;
+    List<SummonerAvgEventResult> finalResults;
     boolean active;
 }
