@@ -86,5 +86,13 @@ function loadRanking() {
 function loadEvent() {
     fetch(`http://localhost:${port}/api/getEventResults`)
         .then(res => res.json())
-        .then(results => createEventResults(results))
+        .then(events => createEventResult(events["test"]["avgResults"][0]))
+}
+
+function XD(results) {
+
+
+
+
+
 }

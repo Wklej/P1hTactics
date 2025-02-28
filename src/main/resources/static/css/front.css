@@ -190,7 +190,7 @@ button:hover {
 }
 
 /* Event Section */
-#event-title {
+.event-title {
     font-size: 28px;  /* Larger than other headings */
     font-weight: bold;
     text-align: center;
@@ -200,8 +200,8 @@ button:hover {
     letter-spacing: 1px;
 }
 
-#event-start,
-#event-end {
+.event-start,
+.event-end {
     font-size: 18px;
     font-weight: 600;
     text-align: center;
@@ -217,11 +217,11 @@ button:hover {
 }
 
 /* Add spacing for better alignment */
-#event-start {
+.event-start {
     margin-right: 10px;
 }
 
-#event-end {
+.event-end {
     margin-left: 10px;
 }
 
