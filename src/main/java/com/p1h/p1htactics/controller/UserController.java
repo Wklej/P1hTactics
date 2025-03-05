@@ -1,10 +1,8 @@
 package com.p1h.p1htactics.controller;
 
 import com.p1h.p1htactics.dto.ApiResponse;
-import com.p1h.p1htactics.dto.FriendDto;
 import com.p1h.p1htactics.dto.SummonerDto;
 import com.p1h.p1htactics.dto.SummonerRegistrationRequest;
-import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +36,7 @@ public class UserController {
     }
 
     @PostMapping("/api/register/friend")
-    public ResponseEntity<ApiResponse> registerFriend(@RequestBody FriendDto newFriend) {
+    public ResponseEntity<ApiResponse> registerFriend(@RequestBody SummonerDto newFriend) {
         //TODO: check for existence
 //            var userExist = userService.isUsernameTaken(newUser.username());
 //            if (userExist) {

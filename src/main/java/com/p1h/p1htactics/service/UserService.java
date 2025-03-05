@@ -1,8 +1,9 @@
 package com.p1h.p1htactics.service;
 
-import com.p1h.p1htactics.dto.FriendDto;
+import com.p1h.p1htactics.dto.SummonerDto;
 import com.p1h.p1htactics.dto.SummonerRegistrationRequest;
 import com.p1h.p1htactics.entity.Summoner;
+import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.UserRepository;
 import com.p1h.p1htactics.util.UserUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class UserService implements UserDetailsService {
         var puuId = riotApiService.getPuuId(newSummoner.gameName(), newSummoner.riotTag());
         var matchHistory = riotApiService.getMatchHistoryByPuuId(puuId, defaultCount);
         Collections.reverse(matchHistory);
-        return createSummoner(
+        var createdSummoner = createSummoner(
                 newSummoner.username(),
                 newSummoner.password(),
                 newSummoner.gameName(),
@@ -39,24 +40,31 @@ public class UserService implements UserDetailsService {
                 puuId,
                 matchHistory
         );
+        userRepository.save(createdSummoner);
+        return createdSummoner;
     }
 
-    public Summoner registerFriend(FriendDto newFriend) {
-        var puuId = riotApiService.getPuuId(newFriend.gameName(), newFriend.riotTag());
+    public SummonerDto registerFriend(SummonerDto newFriend) {
+        var puuId = riotApiService.getPuuId(newFriend.gameName(), newFriend.tag());
         var matchHistory = riotApiService.getMatchHistoryByPuuId(puuId, defaultCount);
         Collections.reverse(matchHistory);
 
         var currentLoggedSummoner = getCurrentLoggedSummoner(UserUtils.getCurrentUsername()).orElseThrow();
         currentLoggedSummoner.getFriends().add(newFriend);
+        userRepository.save(currentLoggedSummoner);
 
-        return createSummoner(
-                null,
-                null,
-                newFriend.gameName(),
-                newFriend.riotTag(),
-                puuId,
-                matchHistory
-        );
+        if (userRepository.findSummonerByGameNameAndTag(newFriend.gameName(), newFriend.tag()).isPresent()) {
+            return newFriend;
+        } else {
+            return SummonerMapper.summonerToSummonerDto(createSummoner(
+                    null,
+                    null,
+                    newFriend.gameName(),
+                    newFriend.tag(),
+                    puuId,
+                    matchHistory
+            ));
+        }
     }
 
     public List<Summoner> getAllSummoners() {

@@ -1,6 +1,6 @@
 package com.p1h.p1htactics.entity;
 
-import com.p1h.p1htactics.dto.FriendDto;
+import com.p1h.p1htactics.dto.SummonerDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,5 +25,5 @@ public class Summoner {
     private String accountId;
     private List<String> matchHistory;
     private LocalDateTime lastUpdated;
-    private List<FriendDto> friends;
+    private List<SummonerDto> friends;
 }

@@ -9,6 +9,7 @@ import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.MatchRepository;
 import com.p1h.p1htactics.repository.UserRepository;
+import com.p1h.p1htactics.util.UserUtils;
 import com.p1h.p1htactics.util.WebClientProxy;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -74,11 +76,18 @@ public class RiotApiService {
     }
 
     public List<SummonerRankingDto> getRankings() {
-        var summoners = userRepository.findAll().stream()
+        var currentLoggedSummoner = userRepository.findByUsername(UserUtils.getCurrentUsername()).orElseThrow();
+        var friends = Optional.ofNullable(currentLoggedSummoner.getFriends())
+                .orElse(List.of())
+                .stream()
+                .map(friendDto -> userRepository.findSummonerByGameNameAndTag(friendDto.gameName(), friendDto.tag()))
+                .flatMap(Optional::stream)
+                .toList();
+        var summonersToGetRankingFor = Stream.concat(Stream.of(currentLoggedSummoner), friends.stream())
                 .map(SummonerMapper::summonerToSummonerDto)
                 .toList();
 
-        return summoners.stream()
+        return summonersToGetRankingFor.stream()
                 .map(summonerDto -> SummonerMapper.summonerDtoToSummonerRankingDto(
                         summonerDto,
                         getAvgPlacement(summonerDto.gameName(), summonerDto.tag(), "1100", 1000)))

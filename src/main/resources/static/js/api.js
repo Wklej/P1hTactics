@@ -60,7 +60,7 @@ function addFriend() {
     const friendGameName = document.getElementById("friendGameName").value
     const friendRiotTag = document.getElementById("friendRiotTag").value
     const url = `http://localhost:${port}/api/register/friend`
-    const requestBody = {gameName: friendGameName, riotTag: friendRiotTag}
+    const requestBody = {gameName: friendGameName, tag: friendRiotTag}
 
     fetch(url, {
         method: 'POST',
@@ -86,7 +86,5 @@ function loadRanking() {
 function loadEvent() {
     fetch(`http://localhost:${port}/api/getEventResults`)
         .then(res => res.json())
-        // .then(events => createEventResult(events["test"]["avgResults"][0]))
-        // .then(events => createEvent(events["test"], "test"))
         .then(events => createEvents(events))
 }

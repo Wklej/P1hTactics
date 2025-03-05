@@ -19,14 +19,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/index.html",
-//                                "/register.html",
-//                                "/templates/register.html",
                                 "/css/**",
                                 "/js/**").permitAll()
                         .requestMatchers(
-//                                "/api/**",
                                 "/login",
                                 "/register",
+                                "/api/register",
                                 "/logout").permitAll()
                         .anyRequest().authenticated()
                 )
