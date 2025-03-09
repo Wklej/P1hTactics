@@ -84,6 +84,11 @@ public class UserService implements UserDetailsService {
         return userRepository.findSummonerByGameName(gameName);
     }
 
+    public List<SummonerDto> getFriends() {
+        return userRepository.findByUsername(UserUtils.getCurrentUsername()).orElseThrow()
+                .getFriends();
+    }
+
     private Summoner createSummoner(String username, String password, String gameName, String tag, String puuId, List<String> matchIds) {
         var summoner = new Summoner(null, username, password, gameName, tag, puuId, null, matchIds, LocalDateTime.now(), new ArrayList<>());
 

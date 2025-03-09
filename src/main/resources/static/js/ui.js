@@ -190,3 +190,18 @@ function createColumnsForPlacementEvent(row, result) {
     row.appendChild(bottomColumn)
     row.appendChild(gamesCountColumn)
 }
+
+function createFriendList(friends) {
+    const friendListContainer = document.getElementById("friendList");
+    friendListContainer.innerHTML = ""; // Clear previous list
+
+    if (friends.length === 0) {
+        return;
+    }
+
+    friends.forEach(friend => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${friend.gameName}#${friend.tag}`;
+        friendListContainer.appendChild(listItem);
+    });
+}

@@ -66,4 +66,8 @@ public class UserController {
                 .orElseThrow();
     }
 
+    @GetMapping("/api/friendList")
+    public List<SummonerDto> getFriendList() {
+        return userService.getFriends();
+    }
 }

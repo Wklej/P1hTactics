@@ -3,6 +3,7 @@ function initPage() {
     getUsers()
     loadRanking()
     loadEvent()
+    loadFriendList()
 }
 
 function tabsHandler() {

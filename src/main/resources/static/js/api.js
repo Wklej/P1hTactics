@@ -88,3 +88,9 @@ function loadEvent() {
         .then(res => res.json())
         .then(events => createEvents(events))
 }
+
+function loadFriendList() {
+    fetch(`http://localhost:${port}/api/friendList`)
+        .then(res => res.json())
+        .then(friends => createFriendList(friends))
+}
