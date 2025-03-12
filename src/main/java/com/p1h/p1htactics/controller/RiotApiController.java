@@ -2,14 +2,14 @@ package com.p1h.p1htactics.controller;
 
 import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.service.RiotApiService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RiotApiController {
 
     private final RiotApiService riotApiService;
