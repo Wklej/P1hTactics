@@ -1,11 +1,12 @@
 const port = 8080
+const hostname = window.location.hostname
 
 function registerUser() {
     const username = document.getElementById('username').value;
     const gameName = document.getElementById('gameName').value;
     const riotTag = document.getElementById('riotTag').value;
     const password = document.getElementById('password').value;
-    const url = `http://localhost:${port}/api/register`
+    const url = `http://${hostname}:${port}/api/register`
     const requestBody = {username: username, gameName: gameName,
         riotTag: riotTag, password: password}
 
@@ -27,13 +28,13 @@ function registerUser() {
 }
 
 function getUsers() {
-    fetch(`http://localhost:${port}/api/getUsers`)
+    fetch(`http://${hostname}:${port}/api/getUsers`)
         .then(res => res.json())
         .then(users => appendUsers(users))
 }
 
 async function getUser(gameName) {
-    const response = await fetch(`http://localhost:${port}/api/getUser/${gameName}`)
+    const response = await fetch(`http://${hostname}:${port}/api/getUser/${gameName}`)
     return await response.json()
 }
 
@@ -49,7 +50,7 @@ async function calculateAverage() {
         throw new Error(e)
     }
 
-    const url = `http://localhost:${port}/history/avg/${user.gameName}/${user.tag}/${gameMode}?limit=${encodeURIComponent(limit)}`
+    const url = `http://${hostname}:${port}/history/avg/${user.gameName}/${user.tag}/${gameMode}?limit=${encodeURIComponent(limit)}`
     fetch(url)
         .then(res => res.text())
         .then(avg => showResult(avg))
@@ -59,7 +60,7 @@ async function calculateAverage() {
 function addFriend() {
     const friendGameName = document.getElementById("friendGameName").value
     const friendRiotTag = document.getElementById("friendRiotTag").value
-    const url = `http://localhost:${port}/api/register/friend`
+    const url = `http://${hostname}:${port}/api/register/friend`
     const requestBody = {gameName: friendGameName, tag: friendRiotTag}
 
     fetch(url, {
@@ -78,19 +79,19 @@ function addFriend() {
 }
 
 function loadRanking() {
-    fetch(`http://localhost:${port}/api/getRanking`)
+    fetch(`http://${hostname}:${port}/api/getRanking`)
         .then(res => res.json())
         .then(ranking => createRanking(ranking))
 }
 
 function loadEvent() {
-    fetch(`http://localhost:${port}/api/getEventResults`)
+    fetch(`http://${hostname}:${port}/api/getEventResults`)
         .then(res => res.json())
         .then(events => createEvents(events))
 }
 
 function loadFriendList() {
-    fetch(`http://localhost:${port}/api/friendList`)
+    fetch(`http://${hostname}:${port}/api/friendList`)
         .then(res => res.json())
         .then(friends => createFriendList(friends))
 }
