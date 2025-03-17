@@ -42,6 +42,7 @@ async function calculateAverage() {
     const selectedUser = document.getElementById("userSelect").value
     const gameMode = document.getElementById("modeSelect").value
     const limit = document.getElementById("matchLimit").value
+    const set = document.getElementById("setSelect").value
     let user
     try {
         user = await getUser(selectedUser)
@@ -50,7 +51,7 @@ async function calculateAverage() {
         throw new Error(e)
     }
 
-    const url = `http://${hostname}:${port}/history/avg/${user.gameName}/${user.tag}/${gameMode}?limit=${encodeURIComponent(limit)}`
+    const url = `http://${hostname}:${port}/history/avg/${user.gameName}/${user.tag}/${gameMode}/${set}?limit=${encodeURIComponent(limit)}`
     fetch(url)
         .then(res => res.text())
         .then(avg => showResult(avg))

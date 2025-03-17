@@ -24,12 +24,13 @@ public class RiotApiController {
         return riotApiService.getMatchHistoryByPuuId(puuid, count);
     }
 
-    @GetMapping("/history/avg/{gameName}/{tagLine}/{gameMode}")
+    @GetMapping("/history/avg/{gameName}/{tagLine}/{gameMode}/{set}")
     public double getAvgPlacement(@PathVariable String gameName,
                                   @PathVariable String tagLine,
                                   @PathVariable String gameMode,
+                                  @PathVariable String set,
                                   @RequestParam(defaultValue = "1000") int limit) {
-        return riotApiService.getAvgPlacement(gameName, tagLine, gameMode, limit);
+        return riotApiService.getAvgPlacementBySet(gameName, tagLine, gameMode, set, limit);
     }
 
     @GetMapping("/api/getRanking")

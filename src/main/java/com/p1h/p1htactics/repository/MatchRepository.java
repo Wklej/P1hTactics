@@ -6,10 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MatchRepository extends MongoRepository<Match, String> {
 
     Match findFirstByMatchId(String matchId);
     List<Match> findByMatchIdInAndGameTimeBetween(List<String> matchId, LocalDateTime start, LocalDateTime end);
+    Optional<Match> findFirstByMatchIdAndSet(String matchId, String set);
 }
