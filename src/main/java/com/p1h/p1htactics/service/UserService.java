@@ -29,33 +29,34 @@ public class UserService implements UserDetailsService {
     private int defaultCount;
 
     public Summoner registerSummoner(SummonerRegistrationRequest newSummoner) {
-        var potentialSummoner = userRepository.findSummonerByGameNameAndTag(newSummoner.gameName(), newSummoner.riotTag());
-        if (potentialSummoner.isPresent()) {
-            var summoner = new Summoner(
-                    potentialSummoner.get().getId(),
-                    newSummoner.username(),
-                    newSummoner.password(),
-                    potentialSummoner.get().getGameName(),
-                    potentialSummoner.get().getTag(),
-                    potentialSummoner.get().getPuuid(),
-                    potentialSummoner.get().getMatchHistory(),
-                    LocalDateTime.now(),
-                    potentialSummoner.get().getFriends()
-            );
-            return userRepository.save(summoner);
-        } else {
-            var puuId = riotApiService.getPuuId(newSummoner.gameName(), newSummoner.riotTag());
-            var matchHistory = riotApiService.getMatchHistoryByPuuId(puuId, defaultCount);
-            Collections.reverse(matchHistory);
-            return createSummoner(
-                    newSummoner.username(),
-                    newSummoner.password(),
-                    newSummoner.gameName(),
-                    newSummoner.riotTag(),
-                    puuId,
-                    matchHistory
-            );
-        }
+        return userRepository.findSummonerByGameNameAndTag(newSummoner.gameName(), newSummoner.riotTag())
+                .map(potentialSummoner -> {
+                    var summoner = new Summoner(
+                            potentialSummoner.getId(),
+                            newSummoner.username(),
+                            newSummoner.password(),
+                            potentialSummoner.getGameName(),
+                            potentialSummoner.getTag(),
+                            potentialSummoner.getPuuid(),
+                            potentialSummoner.getMatchHistory(),
+                            LocalDateTime.now(),
+                            potentialSummoner.getFriends()
+                    );
+                    return userRepository.save(summoner);
+                })
+                .orElseGet(() -> {
+                    var puuId = riotApiService.getPuuId(newSummoner.gameName(), newSummoner.riotTag());
+                    var matchHistory = riotApiService.getMatchHistoryByPuuId(puuId, defaultCount);
+                    Collections.reverse(matchHistory);
+                    return createSummoner(
+                            newSummoner.username(),
+                            newSummoner.password(),
+                            newSummoner.gameName(),
+                            newSummoner.riotTag(),
+                            puuId,
+                            matchHistory
+                    );
+                });
     }
 
     public SummonerDto registerFriend(SummonerDto newFriend) {
