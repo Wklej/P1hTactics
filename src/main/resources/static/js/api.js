@@ -79,8 +79,8 @@ function addFriend() {
         })
 }
 
-function loadRanking() {
-    fetch(`http://${hostname}:${port}/api/getRanking`)
+function loadRanking(selectedSet) {
+    fetch(`http://${hostname}:${port}/api/getRanking/${selectedSet}`)
         .then(res => res.json())
         .then(ranking => createRanking(ranking))
 }

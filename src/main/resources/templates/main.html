@@ -65,6 +65,13 @@
                 </div>
             </div>
             <div class="container hidden" id="ranking-section">
+                <div class="form-group">
+                    <label for="rankingSetSelect">Select Set:</label>
+                    <select id="rankingSetSelect" onchange="loadRanking(this.value)">
+                        <option value="SET_13" selected>13</option>
+                        <option value="SET_14">14</option>
+                    </select>
+                </div>
                 <div class="ranking-table" id="ranking-table">
                     <div class="ranking-header">
                         <span class="column-item">Summoner</span>

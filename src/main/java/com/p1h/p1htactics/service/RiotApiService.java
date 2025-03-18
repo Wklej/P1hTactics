@@ -93,7 +93,7 @@ public class RiotApiService {
                 .doubleValue();
     }
 
-    public List<SummonerRankingDto> getRankings() {
+    public List<SummonerRankingDto> getRankings(String selectedSet) {
         var currentLoggedSummoner = userRepository.findByUsername(UserUtils.getCurrentUsername()).orElseThrow();
         var friends = Optional.ofNullable(currentLoggedSummoner.getFriends())
                 .orElse(List.of())
@@ -108,7 +108,7 @@ public class RiotApiService {
         return summonersToGetRankingFor.stream()
                 .map(summonerDto -> SummonerMapper.summonerDtoToSummonerRankingDto(
                         summonerDto,
-                        getAvgPlacement(summonerDto.gameName(), summonerDto.tag(), "1100", 1000)))
+                        getAvgPlacementBySet(summonerDto.gameName(), summonerDto.tag(), "1100", selectedSet, 1000)))
                 .toList();
     }
 

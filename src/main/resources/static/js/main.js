@@ -1,7 +1,8 @@
 function initPage() {
     tabsHandler()
     getUsers()
-    loadRanking()
+    const defaultSet = document.getElementById("rankingSetSelect").value
+    loadRanking(defaultSet)
     loadEvent()
     loadFriendList()
 }
