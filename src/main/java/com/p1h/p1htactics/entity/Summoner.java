@@ -22,7 +22,6 @@ public class Summoner {
     private String gameName;
     private String tag;
     private String puuid;
-    private String accountId;
     private List<String> matchHistory;
     private LocalDateTime lastUpdated;
     private List<SummonerDto> friends;
