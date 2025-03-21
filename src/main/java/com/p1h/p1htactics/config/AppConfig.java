@@ -20,7 +20,7 @@ public class AppConfig {
         return WebClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeaders(httpHeaders -> {
-                    httpHeaders.set("X-Riot-Token", apiKeyProvider.getApiKey());
+                    httpHeaders.set("X-Riot-Token", "RGAPI-7d2366ed-2b52-4288-9b60-54f3083369aa");
                     httpHeaders.set("Content-Type", "application/json");
                 })
                 .build();
