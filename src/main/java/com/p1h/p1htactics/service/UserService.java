@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class UserService implements UserDetailsService {
     private final RiotApiService riotApiService;
     @Value("${riot.api.history.default}")
     private int defaultCount;
+    private final PasswordEncoder passwordEncoder;
 
     public Summoner registerSummoner(SummonerRegistrationRequest newSummoner) {
         return userRepository.findSummonerByGameNameAndTag(newSummoner.gameName(), newSummoner.riotTag())
@@ -34,7 +36,7 @@ public class UserService implements UserDetailsService {
                     var summoner = new Summoner(
                             potentialSummoner.getId(),
                             newSummoner.username(),
-                            newSummoner.password(),
+                            passwordEncoder.encode(newSummoner.password()),
                             potentialSummoner.getGameName(),
                             potentialSummoner.getTag(),
                             potentialSummoner.getPuuid(),
@@ -50,7 +52,7 @@ public class UserService implements UserDetailsService {
                     Collections.reverse(matchHistory);
                     return createSummoner(
                             newSummoner.username(),
-                            newSummoner.password(),
+                            passwordEncoder.encode(newSummoner.password()),
                             newSummoner.gameName(),
                             newSummoner.riotTag(),
                             puuId,
@@ -120,7 +122,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username)
                 .map(summoner -> org.springframework.security.core.userdetails.User.builder()
                         .username(summoner.getUsername())
-                        .password("{noop}" + summoner.getPassword())
+                        .password(summoner.getPassword())
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException(username));
     }
