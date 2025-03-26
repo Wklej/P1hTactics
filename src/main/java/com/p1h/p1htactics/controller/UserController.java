@@ -1,6 +1,7 @@
 package com.p1h.p1htactics.controller;
 
 import com.p1h.p1htactics.dto.ApiResponse;
+import com.p1h.p1htactics.dto.FriendDto;
 import com.p1h.p1htactics.dto.SummonerDto;
 import com.p1h.p1htactics.dto.SummonerRegistrationRequest;
 import com.p1h.p1htactics.mapper.SummonerMapper;
@@ -68,7 +69,7 @@ public class UserController {
     }
 
     @GetMapping("/api/friendList")
-    public List<SummonerDto> getFriendList() {
+    public List<FriendDto> getFriendList() {
         return userService.getFriends();
     }
 

@@ -213,9 +213,24 @@ function createFriendList(friends) {
         return;
     }
 
+    const tooltip = document.createElement('div')
+    tooltip.id = 'tooltip'
+    tooltip.className = 'tooltip hidden'
+    friendListContainer.appendChild(tooltip);
+
     friends.forEach(friend => {
         const listItem = document.createElement("li");
-        listItem.textContent = `${friend.gameName}#${friend.tag}`;
+        listItem.textContent = `${friend.friend.gameName}#${friend.friend.tag}`;
         friendListContainer.appendChild(listItem);
+
+        listItem.addEventListener('mouseover', () => {
+            // tooltip.innerHTML = ""
+            tooltip.innerHTML = `Rank: ${friend.stats.rank} Points: ${friend.stats.points}`
+            tooltip.classList.remove('hidden')
+        })
+
+        listItem.addEventListener('mouseout', () => {
+            tooltip.classList.add('hidden')
+        })
     });
 }
