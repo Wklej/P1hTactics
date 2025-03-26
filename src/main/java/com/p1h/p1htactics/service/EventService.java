@@ -65,10 +65,8 @@ public class EventService {
 
             if ("AVG".equalsIgnoreCase(title)) {
                 avgList = getAvgEventResults(title);
-            } else if ("PLACEMENT".equalsIgnoreCase(title)) {
+            } else if ("TOP/BOTTOM".equalsIgnoreCase(title)) {
                 placementList = getPlacementCountsForEvent(title);
-            } else if ("TEST".equalsIgnoreCase(title)) {
-                avgList = getAvgEventResults(title);
             }
 
             eventsMap.put(title, new EventData(avgList, placementList));

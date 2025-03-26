@@ -45,7 +45,7 @@ function createEvents(events) {
 }
 
 function createEvent(event, eventName) {
-    const eventResults = eventName === "test" ? event["avgResults"] : event["placementCounts"]
+    const eventResults = eventName === "avg" ? event["avgResults"] : event["placementCounts"]
 
     //creating event header
     createEventHeader(eventResults)
@@ -63,7 +63,7 @@ function createEvent(event, eventName) {
         const row = document.createElement('div')
         row.classList.add('event-row')
 
-        eventName === "test"
+        eventName === "avg"
             ? createColumnsForAvgEvent(row, result)
             : createColumnsForPlacementEvent(row, result)
 
@@ -98,7 +98,7 @@ function createRankingTable(eventName) {
     const rankingHeader = document.createElement('div')
     rankingHeader.classList.add('ranking-header')
 
-    eventName === "test"
+    eventName === "avg"
         ? createRankingTableForAvgEvent(rankingHeader)
         : createRankingTableForPlacementEvent(rankingHeader)
 
