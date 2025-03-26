@@ -22,6 +22,10 @@ public class SummonerMapper {
                 summoner.getUsername(),
                 avg,
                 gamesCount,
-                new EventDto(event.getTitle(), event.getStart(), event.getEnd()));
+                new EventDto(
+                        event.getTitle(),
+                        event.getStart(),
+                        event.getEnd(),
+                        event.getParticipants()));
     }
 }

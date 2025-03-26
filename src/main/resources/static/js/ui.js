@@ -39,39 +39,43 @@ function createRanking(ranking) {
     })
 }
 
-function createEvents(events) {
+function createEvents(events, currentLoggedUser) {
     const eventNames = Object.keys(events)
-    eventNames.forEach(eventName => createEvent(events[eventName], eventName))
+    eventNames.forEach(eventName => createEvent(events[eventName], eventName, currentLoggedUser))
 }
 
-function createEvent(event, eventName) {
+function createEvent(event, eventName, currentLoggedUser) {
     const eventResults = eventName === "avg" ? event["avgResults"] : event["placementCounts"]
+    //TODO: should come from function param
+    const isSignedUp = eventResults[0].eventInfo.participants.includes(currentLoggedUser)
 
     //creating event header
-    createEventHeader(eventResults)
+    createEventHeader(eventResults, isSignedUp)
 
-    //creating ranking table to be filled with event results of each Summoner
-    const table = createRankingTable(eventName)
+    if (isSignedUp) {
+        //creating ranking table to be filled with event results of each Summoner
+        const table = createRankingTable(eventName)
 
-    // Clear existing rows (except header)
-    // document.querySelectorAll('.event-row')
-    //     .forEach(row => row.remove())
+        // Clear existing rows (except header)
+        // document.querySelectorAll('.event-row')
+        //     .forEach(row => row.remove())
 
-    //Create results for each summoner
-    eventResults.forEach(result => {
-        // Populate table with fetched data
-        const row = document.createElement('div')
-        row.classList.add('event-row')
+        //Create results for each summoner
+        eventResults.forEach(result => {
+            // Populate table with fetched data
+            const row = document.createElement('div')
+            row.classList.add('event-row')
 
-        eventName === "avg"
-            ? createColumnsForAvgEvent(row, result)
-            : createColumnsForPlacementEvent(row, result)
+            eventName === "avg"
+                ? createColumnsForAvgEvent(row, result)
+                : createColumnsForPlacementEvent(row, result)
 
-        table.appendChild(row)
-    })
+            table.appendChild(row)
+        })
+    }
 }
 
-function createEventHeader(eventResults) {
+function createEventHeader(eventResults, isSignedUp) {
     const eventSection = document.getElementById('event-section')
     const header = document.createElement('event-header')
 
@@ -87,6 +91,14 @@ function createEventHeader(eventResults) {
     header.appendChild(title)
     header.appendChild(start)
     header.appendChild(end)
+
+    if (!isSignedUp) {
+        const signUpButton = document.createElement('button')
+        signUpButton.innerText = 'Sign Up'
+        signUpButton.classList.add('event-button')
+        header.appendChild(signUpButton)
+    }
+
     eventSection.appendChild(header)
 }
 

@@ -37,6 +37,11 @@ async function getUser(gameName) {
     return await response.json()
 }
 
+async function getCurrentLoggedUser() {
+    const response = await fetch(`http://${hostname}/api/getCurrentUser`)
+    return await response.text()
+}
+
 async function calculateAverage() {
     const selectedUser = document.getElementById("userSelect").value
     const gameMode = document.getElementById("modeSelect").value
@@ -84,10 +89,11 @@ function loadRanking(selectedSet) {
         .then(ranking => createRanking(ranking))
 }
 
-function loadEvent() {
+async function loadEvent() {
+    const currentUser = await getCurrentLoggedUser()
     fetch(`http://${hostname}/api/getEventResults`)
         .then(res => res.json())
-        .then(events => createEvents(events))
+        .then(events => createEvents(events, currentUser))
 }
 
 function loadFriendList() {

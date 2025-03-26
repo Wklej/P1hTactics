@@ -5,6 +5,7 @@ import com.p1h.p1htactics.dto.SummonerDto;
 import com.p1h.p1htactics.dto.SummonerRegistrationRequest;
 import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.service.UserService;
+import com.p1h.p1htactics.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,5 +70,10 @@ public class UserController {
     @GetMapping("/api/friendList")
     public List<SummonerDto> getFriendList() {
         return userService.getFriends();
+    }
+
+    @GetMapping("/api/getCurrentUser")
+    public String getCurrentLoggedUser() {
+        return UserUtils.getCurrentUsername();
     }
 }

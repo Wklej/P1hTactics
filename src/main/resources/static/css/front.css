@@ -238,6 +238,19 @@ button:hover {
     margin-left: 10px;
 }
 
+.event-button {
+    width: 100%;
+    padding: 12px;
+    background: #007BFF;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: inline-block;
+}
+
 .hidden {
     display: none;
 }

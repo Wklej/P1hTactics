@@ -124,7 +124,7 @@ public class EventService {
                             topPlacementCount,
                             bottomPlacementCount,
                             validRankedPlacements.size(),
-                            new EventDto(event.getTitle(), event.getStart(), event.getEnd()));
+                            new EventDto(event.getTitle(), event.getStart(), event.getEnd(), event.getParticipants()));
                 })
                 .toList();
     }
