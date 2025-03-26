@@ -2,7 +2,7 @@ FROM eclipse-temurin:17
 
 WORKDIR /app
 
-COPY build/libs/P1hTactics-0.0.1-SNAPSHOT.jar P1hTactics.jar
+COPY build/libs/P1hTactics-0.1.0.jar P1hTactics.jar
 
 EXPOSE 8080
 
