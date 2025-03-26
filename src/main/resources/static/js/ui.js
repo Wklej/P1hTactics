@@ -50,7 +50,7 @@ function createEvent(event, eventName, currentLoggedUser) {
     const isSignedUp = eventResults[0].eventInfo.participants.includes(currentLoggedUser)
 
     //creating event header
-    createEventHeader(eventResults, isSignedUp)
+    createEventHeader(eventResults, isSignedUp, currentLoggedUser)
 
     if (isSignedUp) {
         //creating ranking table to be filled with event results of each Summoner
@@ -75,7 +75,7 @@ function createEvent(event, eventName, currentLoggedUser) {
     }
 }
 
-function createEventHeader(eventResults, isSignedUp) {
+function createEventHeader(eventResults, isSignedUp, currentLoggedUser) {
     const eventSection = document.getElementById('event-section')
     const header = document.createElement('event-header')
 
@@ -96,6 +96,8 @@ function createEventHeader(eventResults, isSignedUp) {
         const signUpButton = document.createElement('button')
         signUpButton.innerText = 'Sign Up'
         signUpButton.classList.add('event-button')
+        signUpButton.type = 'submit'
+        signUpButton.onclick = () => signUpForEvent(title.innerText, currentLoggedUser)
         header.appendChild(signUpButton)
     }
 

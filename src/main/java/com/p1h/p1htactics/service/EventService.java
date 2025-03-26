@@ -49,7 +49,7 @@ public class EventService {
     }
 
     public void addParticipantToEvent(String title, String username) {
-        var event = eventRepository.findEventByTitle(title);
+        var event = eventRepository.findEventByTitle(title.toLowerCase());
         event.getParticipants().add(username);
         eventRepository.save(event);
     }

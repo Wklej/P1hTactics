@@ -101,3 +101,20 @@ function loadFriendList() {
         .then(res => res.json())
         .then(friends => createFriendList(friends))
 }
+
+function signUpForEvent(eventTitle, loggedUser) {
+    console.log("signing up: " + loggedUser + " for event: " + eventTitle)
+    const url = `http://${hostname}/event/addParticipant`
+    const requestBody = {title: eventTitle, username: loggedUser}
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-type': "application/json"
+        },
+        body: JSON.stringify(requestBody)
+    })
+        .then(() => {
+            location.reload()
+        })
+}
