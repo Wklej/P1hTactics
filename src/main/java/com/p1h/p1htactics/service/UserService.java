@@ -2,7 +2,6 @@ package com.p1h.p1htactics.service;
 
 import com.p1h.p1htactics.dto.FriendDto;
 import com.p1h.p1htactics.dto.SummonerDto;
-import com.p1h.p1htactics.dto.SummonerRankingStats;
 import com.p1h.p1htactics.dto.SummonerRegistrationRequest;
 import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.mapper.SummonerMapper;
@@ -50,6 +49,7 @@ public class UserService implements UserDetailsService {
                 })
                 .orElseGet(() -> {
                     var puuId = riotApiService.getPuuId(newSummoner.gameName(), newSummoner.riotTag());
+                    //TODO: get summonerId
                     var matchHistory = riotApiService.getMatchHistoryByPuuId(puuId, defaultCount);
                     Collections.reverse(matchHistory);
                     return createSummoner(
@@ -109,16 +109,10 @@ public class UserService implements UserDetailsService {
                 .getFriends();
         return friends.stream()
                 .map(friend -> {
-                    var stats = getRankingStats(friend.gameName(), friend.tag());
+                    var stats = riotApiService.getRankingStatsBy(friend.gameName(), friend.tag());
                     return new FriendDto(friend, stats);
                 })
                 .toList();
-    }
-
-    private SummonerRankingStats getRankingStats(String gameName, String tag) {
-        //get user puuid
-        //riotApiService.getRankingStatsByPuuid()
-        return new SummonerRankingStats("gold", 12);
     }
 
     private Summoner createSummoner(String username, String password, String gameName, String tag, String puuId, List<String> matchIds) {

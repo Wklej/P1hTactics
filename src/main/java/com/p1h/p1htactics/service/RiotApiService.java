@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
+import com.p1h.p1htactics.dto.SummonerRankingStats;
 import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.MatchRepository;
@@ -12,6 +13,8 @@ import com.p1h.p1htactics.repository.UserRepository;
 import com.p1h.p1htactics.util.UserUtils;
 import com.p1h.p1htactics.util.WebClientProxy;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,21 +26,25 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RiotApiService {
 
     private final WebClientProxy webClientProxy;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
+    @Value("${riot.api.base-url}")
+    private String baseUrl;
+    @Value("${riot.api.base-url-eune}")
+    private String baseUrlEune;
 
     public String getAccountByRiotId(String gameName, String tagLine) {
-        var accountInfoUri = String.format("/riot/account/v1/accounts/by-riot-id/%s/%s", gameName, tagLine);
+        var accountInfoUri = String.format("%s/riot/account/v1/accounts/by-riot-id/%s/%s", baseUrl, gameName, tagLine);
         return webClientProxy.get(accountInfoUri);
     }
 
     public List<String> getMatchHistoryByPuuId(String puuid, int count) {
-        var matchHistory = String.format("/tft/match/v1/matches/by-puuid/%s/ids?count=%s", puuid, count);
+        var matchHistory = String.format("%s/tft/match/v1/matches/by-puuid/%s/ids?count=%s", baseUrl, puuid, count);
         var response = webClientProxy.get(matchHistory);
         try {
             return objectMapper.readValue(response, new TypeReference<>() {});
@@ -121,6 +128,40 @@ public class RiotApiService {
                     .map(p -> p.get("placement").asInt());
         } else {
             return Optional.empty();
+        }
+    }
+
+    public SummonerRankingStats getRankingStatsBy(String gameName, String tag) {
+        var puuid = getPuuId(gameName, tag);
+        //send request to TFT-SUMMONER-V1 by-puuid/encPUUID and get id (summonerId)
+        var accountIdRequest = String.format("%s/tft/summoner/v1/summoners/by-puuid/%s", baseUrlEune, puuid);
+        var accountIdResponse = webClientProxy.get(accountIdRequest);
+        var summonerId = getSummonerId(accountIdResponse);
+        //then request to TFT-LEAGUE-V1 by-summoner/summonerId and filter response
+        var accountStatsRequest = String.format("%s/tft/league/v1/entries/by-summoner/%s", baseUrlEune, summonerId);
+        var accountStatsResponse = webClientProxy.get(accountStatsRequest);
+        return getRankedStats(accountStatsResponse);
+    }
+
+    private String getSummonerId(String accountInfo) {
+        try {
+            return objectMapper.readTree(accountInfo).get("id").asText();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error while processing summoner ID JSON.");
+        }
+    }
+
+    private SummonerRankingStats getRankedStats(String accountStats) {
+        // 0 - ranked, 1 - double up
+        try {
+            var rankedJson = objectMapper.readTree(accountStats).get(0);
+            var tier = rankedJson.get("tier").asText();
+            var rank = rankedJson.get("rank").asText();
+            var points = rankedJson.get("leaguePoints").asInt();
+            var summonerRank = String.format("%s %s", tier, rank);
+            return new SummonerRankingStats(summonerRank, points);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error while processing ranked stats JSON.");
         }
     }
 
