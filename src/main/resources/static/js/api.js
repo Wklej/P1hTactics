@@ -27,6 +27,7 @@ function registerUser() {
             document.getElementById('gameName').value = '';
             document.getElementById('riotTag').value = '';
             document.getElementById('password').value = '';
+            window.location.href = "login.html"
         })
         .catch(error => {
             document.getElementById("errorMessage").textContent = error.error
