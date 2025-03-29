@@ -12,7 +12,6 @@ import com.p1h.p1htactics.repository.MatchRepository;
 import com.p1h.p1htactics.repository.UserRepository;
 import com.p1h.p1htactics.util.UserUtils;
 import com.p1h.p1htactics.util.WebClientProxy;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,11 @@ public class RiotApiService {
     public String getAccountByRiotId(String gameName, String tagLine) {
         var accountInfoUri = String.format("%s/riot/account/v1/accounts/by-riot-id/%s/%s", baseUrl, gameName, tagLine);
         return webClientProxy.get(accountInfoUri);
+    }
+
+    public int getAccountByRiotIdStatusCode(String gameName, String tagLine) {
+        var accountInfoUri = String.format("%s/riot/account/v1/accounts/by-riot-id/%s/%s", baseUrl, gameName, tagLine);
+        return webClientProxy.getStatusCode(accountInfoUri);
     }
 
     public List<String> getMatchHistoryByPuuId(String puuid, int count) {

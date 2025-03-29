@@ -22,12 +22,17 @@ public class UserController {
 
     @PostMapping("/api/register")
     public ResponseEntity<ApiResponse> register(@RequestBody SummonerRegistrationRequest newSummoner) {
-        //TODO: check for existence
-//            var userExist = userService.isUsernameTaken(newUser.username());
-//            if (userExist) {
-//                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already taken.");
-//            }
         try {
+            var userExist = userService.isUsernameTaken(newSummoner.username());
+            if (userExist) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new ApiResponse(null, "Username already taken."));
+            }
+            var summonerExist = userService.summonerExist(newSummoner.gameName(), newSummoner.riotTag());
+            if (!summonerExist) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new ApiResponse(null, "Summoner does not exist.."));
+            }
             var createdSummoner = userService.registerSummoner(newSummoner);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ApiResponse(createdSummoner, null));
@@ -39,12 +44,12 @@ public class UserController {
 
     @PostMapping("/api/register/friend")
     public ResponseEntity<ApiResponse> registerFriend(@RequestBody SummonerDto newFriend) {
-        //TODO: check for existence
-//            var userExist = userService.isUsernameTaken(newUser.username());
-//            if (userExist) {
-//                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already taken.");
-//            }
         try {
+            var summonerExist = userService.summonerExist(newFriend.gameName(), newFriend.tag());
+            if (!summonerExist) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new ApiResponse(null, "Summoner does not exist.."));
+            }
             var createdSummoner = userService.registerFriend(newFriend);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ApiResponse(createdSummoner, null));

@@ -16,13 +16,20 @@ function registerUser() {
         },
         body: JSON.stringify(requestBody)
     })
-        .then(res => res.json())
-        .then(data => console.log(data))
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw err; })
+            }
+            return res.json()
+        })
         .then(() => {
             document.getElementById('username').value = '';
             document.getElementById('gameName').value = '';
             document.getElementById('riotTag').value = '';
             document.getElementById('password').value = '';
+        })
+        .catch(error => {
+            document.getElementById("errorMessage").textContent = error.error
         })
 }
 
@@ -75,11 +82,19 @@ function addFriend() {
         },
         body: JSON.stringify(requestBody)
     })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw err; })
+            }
+            return res.json()
+        })
         .then(data => console.log(data))
         .then(() => {
             document.getElementById('friendGameName').value = '';
             document.getElementById('friendRiotTag').value = '';
+        })
+        .catch(error => {
+            document.getElementById("errorMessageFriend").textContent = error.error
         })
 }
 

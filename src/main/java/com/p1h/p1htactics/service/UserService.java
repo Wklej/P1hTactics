@@ -115,6 +115,15 @@ public class UserService implements UserDetailsService {
                 .toList();
     }
 
+    public boolean isUsernameTaken(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    public boolean summonerExist(String gameName, String tag) {
+        var statusCode = riotApiService.getAccountByRiotIdStatusCode(gameName, tag);
+        return statusCode == 200;
+    }
+
     private Summoner createSummoner(String username, String password, String gameName, String tag, String puuId, List<String> matchIds) {
         var summoner = new Summoner(null, username, password, gameName, tag, puuId, matchIds, LocalDateTime.now(), new ArrayList<>());
 
