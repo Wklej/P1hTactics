@@ -87,6 +87,10 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public boolean userExist(String gameName, String tag) {
+        return getSummonerBy(gameName, tag).isPresent();
+    }
+
     public List<Summoner> getAllSummoners() {
         return userRepository.findAll();
     }
@@ -113,6 +117,12 @@ public class UserService implements UserDetailsService {
                     return new FriendDto(friend, stats);
                 })
                 .toList();
+    }
+
+    public boolean hasFriendAlready(String gameName, String tag) {
+        return getFriends().stream()
+                .anyMatch(friendDto -> friendDto.friend().gameName().equals(gameName)
+                        && friendDto.friend().tag().equals(tag));
     }
 
     public boolean isUsernameTaken(String username) {

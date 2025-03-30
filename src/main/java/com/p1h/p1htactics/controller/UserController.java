@@ -23,32 +23,25 @@ public class UserController {
     @PostMapping("/api/register")
     public ResponseEntity<ApiResponse> register(@RequestBody SummonerRegistrationRequest newSummoner) {
         try {
-            var userExist = userService.isUsernameTaken(newSummoner.username());
-            if (userExist) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(new ApiResponse(null, "Username already taken."));
+            var errorMessage = validateSummoner(newSummoner);
+            if (errorMessage != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(null, errorMessage));
             }
-            var summonerExist = userService.summonerExist(newSummoner.gameName(), newSummoner.riotTag());
-            if (!summonerExist) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(new ApiResponse(null, "Summoner does not exist.."));
-            }
+
             var createdSummoner = userService.registerSummoner(newSummoner);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse(createdSummoner, null));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(createdSummoner, null));
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(null, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(null, e.getMessage()));
         }
     }
 
     @PostMapping("/api/register/friend")
     public ResponseEntity<ApiResponse> registerFriend(@RequestBody SummonerDto newFriend) {
         try {
-            var summonerExist = userService.summonerExist(newFriend.gameName(), newFriend.tag());
-            if (!summonerExist) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(new ApiResponse(null, "Summoner does not exist.."));
+            var errorMessage = validateFriend(newFriend);
+            if (errorMessage != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(null, errorMessage));
             }
             var createdSummoner = userService.registerFriend(newFriend);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -81,5 +74,28 @@ public class UserController {
     @GetMapping("/api/getCurrentUser")
     public String getCurrentLoggedUser() {
         return UserUtils.getCurrentUsername();
+    }
+
+    private String validateSummoner(SummonerRegistrationRequest newSummoner) {
+        if (userService.isUsernameTaken(newSummoner.username())) {
+            return "Username already taken.";
+        }
+        if (!userService.summonerExist(newSummoner.gameName(), newSummoner.riotTag())) {
+            return "Summoner does not exist.";
+        }
+        if (userService.userExist(newSummoner.gameName(), newSummoner.riotTag())) {
+            return "There is already a user created for this Summoner.";
+        }
+        return null;
+    }
+
+    private String validateFriend(SummonerDto newFriend) {
+        if (!userService.summonerExist(newFriend.gameName(), newFriend.tag())) {
+            return "Summoner does not exist.";
+        }
+        if (userService.hasFriendAlready(newFriend.gameName(), newFriend.tag())) {
+            return "It is Your friend already.";
+        }
+        return null;
     }
 }
