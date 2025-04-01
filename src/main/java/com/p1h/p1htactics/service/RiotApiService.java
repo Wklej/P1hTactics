@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.dto.SummonerRankingStats;
+import com.p1h.p1htactics.entity.Match;
 import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.MatchRepository;
@@ -68,31 +69,13 @@ public class RiotApiService {
         }
     }
 
-    public double getAvgPlacement(String gameName, String tagLine, String gameMode, int limit) {
-        var summoner = userRepository.findSummonerByGameNameAndTag(gameName, tagLine).orElseThrow();
-        var matchHistory = summoner.getMatchHistory();
-        Collections.reverse(matchHistory);
-
-        var average = matchHistory.stream()
-                .map(matchId -> getPlacementIfMatchModeWithMatchId(matchId, gameMode, summoner))
-                .flatMap(Optional::stream)
-                .limit(limit)
-                .mapToInt(Integer::intValue)
-                .average()
-                .orElse(0.0);
-
-        return BigDecimal.valueOf(average)
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
-    }
-
     public double getAvgPlacementBySet(String gameName, String tagLine, String gameMode, String set, int limit) {
         var summoner = userRepository.findSummonerByGameNameAndTag(gameName, tagLine).orElseThrow();
         var matchHistory = summoner.getMatchHistory();
         Collections.reverse(matchHistory);
 
         var average = matchHistory.stream()
-                .map(matchId -> getPlacementIfMatchModeAndSetWithMatchId(matchId, gameMode, summoner, set))
+                .map(matchId -> getPlacementBy(matchId, summoner.getGameName(), gameMode, set))
                 .flatMap(Optional::stream)
                 .limit(limit)
                 .mapToInt(Integer::intValue)
@@ -169,40 +152,14 @@ public class RiotApiService {
         }
     }
 
-    private String getMatchDetails(String matchId) {
-        return matchRepository.findFirstByMatchId(matchId).getDetails();
-    }
-
-    private Optional<String> getMatchDetailsIfSet(String matchId, String set) {
-        var match = matchRepository.findFirstByMatchIdAndSet(matchId, set);
-        return match.flatMap(value -> value.getDetails().describeConstable());
-    }
-
     private Optional<JsonNode> findParticipantByPuuId(JsonNode participantsNode, String puuId) {
         return StreamSupport.stream(participantsNode.spliterator(), false)
                 .filter(p -> p.has("puuid") && p.get("puuid").asText().equals(puuId))
                 .findFirst();
     }
 
-    private Optional<Integer> getPlacementIfMatchModeWithMatchId(String matchId, String gameMode, Summoner summoner) {
-        try {
-            String details = getMatchDetails(matchId);
-            return getPlacement(gameMode, summoner, details);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error while processing JSON for match " + matchId, e);
-        }
-    }
-
-    private Optional<Integer> getPlacementIfMatchModeAndSetWithMatchId(String matchId, String gameMode, Summoner summoner, String set) {
-        try {
-            Optional<String> details = getMatchDetailsIfSet(matchId, set);
-            if (details.isPresent()) {
-                return getPlacement(gameMode, summoner, details.get());
-            } else {
-                return Optional.empty();
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error while processing JSON for match " + matchId, e);
-        }
+    private Optional<Integer> getPlacementBy(String matchId, String summonerName, String gameMode, String set) {
+        return matchRepository.findByMatchIdAndSummonerNameAndGameModeAndSet(matchId, summonerName, gameMode, set)
+                .map(Match::getPlacement);
     }
 }

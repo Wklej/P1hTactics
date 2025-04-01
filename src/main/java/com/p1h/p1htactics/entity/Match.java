@@ -21,4 +21,6 @@ public class Match {
     String summonerName;
     @Indexed
     String set;
+    int placement;
+    String gameMode;
 }
