@@ -127,6 +127,9 @@ public class RiotApiService {
         //then request to TFT-LEAGUE-V1 by-summoner/summonerId and filter response
         var accountStatsRequest = String.format("%s/tft/league/v1/entries/by-summoner/%s", baseUrlEune, summonerId);
         var accountStatsResponse = webClientProxy.get(accountStatsRequest);
+        if (accountStatsResponse.equals("[]")) {
+            return new SummonerRankingStats("UNKNOWN", 0);
+        }
         return getRankedStats(accountStatsResponse);
     }
 
