@@ -5,7 +5,7 @@
     <title>P1H Tactics</title>
     <link rel="stylesheet" href="css/front.css">
     <script src="js/main.js"></script>
-    <script src="js/api.js"></script>
+    <script src="js/api_local.js"></script>
     <script src="js/ui.js"></script>
 </head>
 <body>
@@ -68,9 +68,14 @@
             <div class="container hidden" id="ranking-section">
                 <div class="form-group">
                     <label for="rankingSetSelect">Select Set:</label>
-                    <select id="rankingSetSelect" onchange="loadRanking(this.value)">
-                        <option value="13" selected>13</option>
-                        <option value="14">14</option>
+                    <select id="rankingSetSelect" onchange="loadRanking()">
+                        <option value="13">13</option>
+                        <option value="14" selected>14</option>
+                    </select>
+                    <label for="rankingModeSelect">Select Set:</label>
+                    <select id="rankingModeSelect" onchange="loadRanking()">
+                        <option value="1100" selected>Ranked</option>
+                        <option value="1160">Double Up</option>
                     </select>
                 </div>
                 <div class="ranking-table" id="ranking-table">

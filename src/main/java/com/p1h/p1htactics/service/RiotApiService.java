@@ -77,6 +77,7 @@ public class RiotApiService {
         var average = matchHistory.stream()
                 .map(matchId -> getPlacementBy(matchId, summoner.getGameName(), gameMode, set))
                 .flatMap(Optional::stream)
+                .map(placement -> placementMapper(placement, gameMode))
                 .limit(limit)
                 .mapToInt(Integer::intValue)
                 .average()
@@ -87,7 +88,7 @@ public class RiotApiService {
                 .doubleValue();
     }
 
-    public List<SummonerRankingDto> getRankings(String selectedSet) {
+    public List<SummonerRankingDto> getRankings(String selectedSet, String selectedMode) {
         var currentLoggedSummoner = userRepository.findByUsername(UserUtils.getCurrentUsername()).orElseThrow();
         var friends = Optional.ofNullable(currentLoggedSummoner.getFriends())
                 .orElse(List.of())
@@ -102,7 +103,7 @@ public class RiotApiService {
         return summonersToGetRankingFor.stream()
                 .map(summonerDto -> SummonerMapper.summonerDtoToSummonerRankingDto(
                         summonerDto,
-                        getAvgPlacementBySet(summonerDto.gameName(), summonerDto.tag(), "1100", selectedSet, 1000)))
+                        getAvgPlacementBySet(summonerDto.gameName(), summonerDto.tag(), selectedMode, selectedSet, 1000)))
                 .toList();
     }
 
@@ -164,5 +165,21 @@ public class RiotApiService {
     private Optional<Integer> getPlacementBy(String matchId, String summonerName, String gameMode, String set) {
         return matchRepository.findByMatchIdAndSummonerNameAndGameModeAndSet(matchId, summonerName, gameMode, set)
                 .map(Match::getPlacement);
+    }
+
+    private Integer placementMapper(int placement, String gameMode) {
+        if (gameMode.equals("1160")) {
+            return getDoubleUpPlacement(placement);
+        }
+        return placement;
+    }
+
+    private int getDoubleUpPlacement(int placement) {
+        return switch (placement) {
+            case 1, 2 -> 1;
+            case 3, 4 -> 2;
+            case 5, 6 -> 3;
+            default   -> 4;
+        };
     }
 }

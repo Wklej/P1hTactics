@@ -99,8 +99,15 @@ function addFriend() {
         })
 }
 
-function loadRanking(selectedSet) {
-    fetch(`http://${hostname}/api/getRanking/${selectedSet}`)
+function loadRanking() {
+    const set = document.getElementById('rankingSetSelect').value
+    const mode = document.getElementById('rankingModeSelect').value
+
+    loadRanked(set, mode)
+}
+
+function loadRanked(selectedSet, selectedMode) {
+    fetch(`http://${hostname}/api/getRanking/${selectedSet}/${selectedMode}`)
         .then(res => res.json())
         .then(ranking => createRanking(ranking))
 }

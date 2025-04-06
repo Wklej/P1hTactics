@@ -33,9 +33,9 @@ public class RiotApiController {
         return riotApiService.getAvgPlacementBySet(gameName, tagLine, gameMode, set, limit);
     }
 
-    @GetMapping("/api/getRanking/{selectedSet}")
-    public List<SummonerRankingDto> getRanking(@PathVariable String selectedSet) {
-        return riotApiService.getRankings(selectedSet);
+    @GetMapping("/api/getRanking/{selectedSet}/{selectedMode}")
+    public List<SummonerRankingDto> getRanking(@PathVariable String selectedSet, @PathVariable String selectedMode) {
+        return riotApiService.getRankings(selectedSet, selectedMode);
     }
 
 }
