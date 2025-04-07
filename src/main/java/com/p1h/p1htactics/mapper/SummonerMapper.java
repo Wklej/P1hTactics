@@ -1,9 +1,6 @@
 package com.p1h.p1htactics.mapper;
 
-import com.p1h.p1htactics.dto.EventDto;
-import com.p1h.p1htactics.dto.SummonerAvgEventResult;
-import com.p1h.p1htactics.dto.SummonerDto;
-import com.p1h.p1htactics.dto.SummonerRankingDto;
+import com.p1h.p1htactics.dto.*;
 import com.p1h.p1htactics.entity.Event;
 import com.p1h.p1htactics.entity.Summoner;
 
@@ -27,5 +24,9 @@ public class SummonerMapper {
                         event.getStart(),
                         event.getEnd(),
                         event.getParticipants()));
+    }
+
+    public static SummonerRankingStats RankedStatsDtoToSummonerRankingStats(RankedStatsDto statsDto) {
+        return new SummonerRankingStats(statsDto.rank(), statsDto.tier(), statsDto.leaguePoints());
     }
 }

@@ -114,7 +114,7 @@ public class UserService implements UserDetailsService {
         return friends.stream()
                 .map(friend -> {
                     var stats = riotApiService.getRankingStatsBy(friend.gameName(), friend.tag());
-                    return new FriendDto(friend, stats);
+                    return new FriendDto(friend, stats.get("RANKED_TFT"), stats.get("RANKED_TFT_DOUBLE_UP"));
                 })
                 .toList();
     }

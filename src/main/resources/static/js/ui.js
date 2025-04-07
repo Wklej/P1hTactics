@@ -225,7 +225,12 @@ function createFriendList(friends) {
 
         listItem.addEventListener('mouseover', () => {
             // tooltip.innerHTML = ""
-            tooltip.innerHTML = `Rank: ${friend.stats.rank} Points: ${friend.stats.points}`
+            if (friend.rankedStats !== null) {
+                tooltip.innerHTML = `RANKED Rank: ${friend.rankedStats.tier} ${friend.rankedStats.rank} Points: ${friend.rankedStats.points}`
+            }
+            if (friend.doubleUpStats !== null) {
+                tooltip.innerHTML = `DOUBLE-UP Rank: ${friend.doubleUpStats.tier} ${friend.doubleUpStats.rank} Points: ${friend.doubleUpStats.points}`
+            }
             tooltip.classList.remove('hidden')
         })
 

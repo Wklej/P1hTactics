@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.p1h.p1htactics.dto.RankedStatsDto;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.dto.SummonerRankingStats;
 import com.p1h.p1htactics.entity.Match;
@@ -21,7 +22,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -119,7 +122,7 @@ public class RiotApiService {
         }
     }
 
-    public SummonerRankingStats getRankingStatsBy(String gameName, String tag) {
+    public Map<String, SummonerRankingStats> getRankingStatsBy(String gameName, String tag) {
         var puuid = getPuuId(gameName, tag);
         //send request to TFT-SUMMONER-V1 by-puuid/encPUUID and get id (summonerId)
         var accountIdRequest = String.format("%s/tft/summoner/v1/summoners/by-puuid/%s", baseUrlEune, puuid);
@@ -129,7 +132,8 @@ public class RiotApiService {
         var accountStatsRequest = String.format("%s/tft/league/v1/entries/by-summoner/%s", baseUrlEune, summonerId);
         var accountStatsResponse = webClientProxy.get(accountStatsRequest);
         if (accountStatsResponse.equals("[]")) {
-            return new SummonerRankingStats("UNKNOWN", 0);
+            return Map.of("RANKED_TFT", new SummonerRankingStats("UNKNOWN", "UNKNOWN", 0),
+                    "RANKED_TFT_DOUBLE_UP", new SummonerRankingStats("UNKNOWN", "UNKNOWN", 0));
         }
         return getRankedStats(accountStatsResponse);
     }
@@ -142,17 +146,21 @@ public class RiotApiService {
         }
     }
 
-    private SummonerRankingStats getRankedStats(String accountStats) {
-        // 0 - ranked, 1 - double up
+    private Map<String, SummonerRankingStats> getRankedStats(String accountStats) {
         try {
-            var rankedJson = objectMapper.readTree(accountStats).get(0);
-            var tier = rankedJson.get("tier").asText();
-            var rank = rankedJson.get("rank").asText();
-            var points = rankedJson.get("leaguePoints").asInt();
-            var summonerRank = String.format("%s %s", tier, rank);
-            return new SummonerRankingStats(summonerRank, points);
+            var stats = objectMapper.readValue(
+                    accountStats,
+                    new TypeReference<List<RankedStatsDto>>() {}
+            );
+
+            return stats.stream()
+                    .filter(s -> "RANKED_TFT".equals(s.queueType()) || "RANKED_TFT_DOUBLE_UP".equals(s.queueType()))
+                    .collect(Collectors.toMap(
+                            RankedStatsDto::queueType,
+                            SummonerMapper::RankedStatsDtoToSummonerRankingStats
+                    ));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error while processing ranked stats JSON.");
+            throw new RuntimeException("Error while processing ranked rankedStats JSON.");
         }
     }
 
