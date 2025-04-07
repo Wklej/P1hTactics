@@ -224,13 +224,17 @@ function createFriendList(friends) {
         friendListContainer.appendChild(listItem);
 
         listItem.addEventListener('mouseover', () => {
-            // tooltip.innerHTML = ""
+            let tooltipContent = ''
+
             if (friend.rankedStats !== null) {
-                tooltip.innerHTML = `RANKED Rank: ${friend.rankedStats.tier} ${friend.rankedStats.rank} Points: ${friend.rankedStats.points}`
+                tooltipContent += `RANKED Rank: ${friend.rankedStats.tier} ${friend.rankedStats.rank} Points: ${friend.rankedStats.points}<br>`
             }
+
             if (friend.doubleUpStats !== null) {
-                tooltip.innerHTML = `DOUBLE-UP Rank: ${friend.doubleUpStats.tier} ${friend.doubleUpStats.rank} Points: ${friend.doubleUpStats.points}`
+                tooltipContent += `DOUBLE-UP Rank: ${friend.doubleUpStats.tier} ${friend.doubleUpStats.rank} Points: ${friend.doubleUpStats.points}`
             }
+
+            tooltip.innerHTML = tooltipContent
             tooltip.classList.remove('hidden')
         })
 

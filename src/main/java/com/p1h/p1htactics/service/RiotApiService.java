@@ -131,10 +131,6 @@ public class RiotApiService {
         //then request to TFT-LEAGUE-V1 by-summoner/summonerId and filter response
         var accountStatsRequest = String.format("%s/tft/league/v1/entries/by-summoner/%s", baseUrlEune, summonerId);
         var accountStatsResponse = webClientProxy.get(accountStatsRequest);
-        if (accountStatsResponse.equals("[]")) {
-            return Map.of("RANKED_TFT", new SummonerRankingStats("UNKNOWN", "UNKNOWN", 0),
-                    "RANKED_TFT_DOUBLE_UP", new SummonerRankingStats("UNKNOWN", "UNKNOWN", 0));
-        }
         return getRankedStats(accountStatsResponse);
     }
 
@@ -148,6 +144,11 @@ public class RiotApiService {
 
     private Map<String, SummonerRankingStats> getRankedStats(String accountStats) {
         try {
+            if (accountStats.equals("[]")) {
+                return Map.of("RANKED_TFT", new SummonerRankingStats("UNKNOWN", "UNKNOWN", 0),
+                        "RANKED_TFT_DOUBLE_UP", new SummonerRankingStats("UNKNOWN", "UNKNOWN", 0));
+            }
+
             var stats = objectMapper.readValue(
                     accountStats,
                     new TypeReference<List<RankedStatsDto>>() {}
