@@ -125,6 +125,12 @@ function loadFriendList() {
         .then(friends => createFriendList(friends))
 }
 
+function loadUserInfo() {
+    fetch(`http://${hostname}/api/userInfo`)
+        .then(res => res.json())
+        .then(info => createUserInfo(info))
+}
+
 function signUpForEvent(eventTitle, loggedUser) {
     console.log("signing up: " + loggedUser + " for event: " + eventTitle)
     const url = `http://${hostname}/event/addParticipant`

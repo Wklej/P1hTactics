@@ -30,6 +30,8 @@ public class UserService implements UserDetailsService {
     @Value("${riot.api.history.default}")
     private int defaultCount;
     private final PasswordEncoder passwordEncoder;
+    private final static String RANKED_NAME = "TFT_RANKED";
+    private final static String DOUBLE_UP_NAME = "TFT_RANKED_DOUBLE_UP";
 
     public Summoner registerSummoner(SummonerRegistrationRequest newSummoner) {
         return userRepository.findSummonerByGameNameAndTag(newSummoner.gameName(), newSummoner.riotTag())
@@ -114,9 +116,21 @@ public class UserService implements UserDetailsService {
         return friends.stream()
                 .map(friend -> {
                     var stats = riotApiService.getRankingStatsBy(friend.gameName(), friend.tag());
-                    return new FriendDto(friend, stats.get("RANKED_TFT"), stats.get("RANKED_TFT_DOUBLE_UP"));
+                    return new FriendDto(friend, stats.get(RANKED_NAME), stats.get(DOUBLE_UP_NAME));
                 })
                 .toList();
+    }
+
+    public FriendDto getUserInfo() {
+        var currentLoggedUser = userRepository.findByUsername(UserUtils.getCurrentUsername())
+                .map(SummonerMapper::summonerToSummonerDto);
+        return currentLoggedUser.stream()
+                .map(summonerDto -> {
+                    var stats = riotApiService.getRankingStatsBy(summonerDto.gameName(), summonerDto.tag());
+                    return new FriendDto(summonerDto, stats.get(RANKED_NAME), stats.get(DOUBLE_UP_NAME));
+                })
+                .findFirst()
+                .orElseThrow();
     }
 
     public boolean hasFriendAlready(String gameName, String tag) {

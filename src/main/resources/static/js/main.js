@@ -6,6 +6,7 @@ function initPage() {
     loadRanking(defaultSet, defaultMode)
     loadEvent()
     loadFriendList()
+    loadUserInfo()
 }
 
 function tabsHandler() {

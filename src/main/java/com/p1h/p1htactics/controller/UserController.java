@@ -71,6 +71,11 @@ public class UserController {
         return userService.getFriends();
     }
 
+    @GetMapping("/api/userInfo")
+    public FriendDto getUserInfo() {
+        return userService.getUserInfo();
+    }
+
     @GetMapping("/api/getCurrentUser")
     public String getCurrentLoggedUser() {
         return UserUtils.getCurrentUsername();

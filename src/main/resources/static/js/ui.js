@@ -243,3 +243,19 @@ function createFriendList(friends) {
         })
     });
 }
+
+function createUserInfo(info) {
+    const name = document.getElementById("currentUserName")
+    name.innerText = `${info.friend.gameName}#${info.friend.tag}`;
+    const rank = document.getElementById("currentUserRank")
+    let rankContent = ''
+
+    if (info.rankedStats !== null) {
+        rankContent += `RANKED: ${info.rankedStats.tier} ${info.rankedStats.rank} ${info.rankedStats.points}lp <br>`
+    }
+    if (info.doubleUpStats !== null) {
+        rankContent += `DOUBLE-UP: ${info.doubleUpStats.tier} ${info.doubleUpStats.rank} ${info.doubleUpStats.points}lp`
+    }
+
+    rank.innerHTML = rankContent
+}
