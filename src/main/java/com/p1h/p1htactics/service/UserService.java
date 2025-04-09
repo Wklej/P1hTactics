@@ -30,8 +30,8 @@ public class UserService implements UserDetailsService {
     @Value("${riot.api.history.default}")
     private int defaultCount;
     private final PasswordEncoder passwordEncoder;
-    private final static String RANKED_NAME = "TFT_RANKED";
-    private final static String DOUBLE_UP_NAME = "TFT_RANKED_DOUBLE_UP";
+    private final static String RANKED_NAME = "RANKED_TFT";
+    private final static String DOUBLE_UP_NAME = "RANKED_TFT_DOUBLE_UP";
 
     public Summoner registerSummoner(SummonerRegistrationRequest newSummoner) {
         return userRepository.findSummonerByGameNameAndTag(newSummoner.gameName(), newSummoner.riotTag())
