@@ -40,14 +40,15 @@ function createRanking(ranking) {
 }
 
 function createEvents(events, currentLoggedUser) {
-    const eventNames = Object.keys(events)
-    eventNames.forEach(eventName => createEvent(events[eventName], eventName, currentLoggedUser))
+    Object.values(events).forEach(eventResults => createEvent(eventResults, currentLoggedUser))
 }
 
-function createEvent(event, eventName, currentLoggedUser) {
-    const eventResults = eventName === "avg" ? event["avgResults"] : event["placementCounts"]
-    //TODO: should come from function param
-    const isSignedUp = eventResults[0].eventInfo.participants.includes(currentLoggedUser)
+function createEvent(eventResults, currentLoggedUser) {
+    const eventName = eventResults.title
+    const results = eventName === "avg" ? eventResults.avgEventResults : eventResults.placementEventResults
+    const isSignedUp = eventResults.length !== 0
+        ? results.map(result => result.summonerName).includes(currentLoggedUser)
+        : false
 
     //creating event header
     createEventHeader(eventResults, isSignedUp, currentLoggedUser)
@@ -61,7 +62,7 @@ function createEvent(event, eventName, currentLoggedUser) {
         //     .forEach(row => row.remove())
 
         //Create results for each summoner
-        eventResults.forEach(result => {
+        results.forEach(result => {
             // Populate table with fetched data
             const row = document.createElement('div')
             row.classList.add('event-row')
@@ -81,13 +82,13 @@ function createEventHeader(eventResults, isSignedUp, currentLoggedUser) {
 
     const title = document.createElement('div')
     title.classList.add('event-title')
-    title.innerText = eventResults[0].eventInfo.title
+    title.innerText = eventResults.title
     const start = document.createElement('div')
     start.classList.add('event-start')
-    start.innerText = 'Starts at: ' + eventResults[0].eventInfo.start
+    start.innerText = 'Starts at: ' + eventResults.start
     const end = document.createElement('div')
     end.classList.add('event-end')
-    end.innerText = 'Ends at: ' + eventResults[0].eventInfo.end
+    end.innerText = 'Ends at: ' + eventResults.end
     header.appendChild(title)
     header.appendChild(start)
     header.appendChild(end)

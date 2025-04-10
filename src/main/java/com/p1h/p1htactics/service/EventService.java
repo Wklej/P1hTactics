@@ -5,9 +5,10 @@ import com.p1h.p1htactics.dto.EventData;
 import com.p1h.p1htactics.dto.EventDto;
 import com.p1h.p1htactics.dto.PlacementCountDto;
 import com.p1h.p1htactics.dto.SummonerAvgEventResult;
-import com.p1h.p1htactics.entity.Event;
+import com.p1h.p1htactics.entity.EventEntity;
 import com.p1h.p1htactics.entity.Match;
 import com.p1h.p1htactics.entity.Summoner;
+import com.p1h.p1htactics.events.*;
 import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.EventRepository;
 import com.p1h.p1htactics.repository.MatchRepository;
@@ -28,7 +29,7 @@ public class EventService {
     private final MatchRepository matchRepository;
     private final RiotApiService riotApiService;
 
-    public Event getEvent(String eventTitle) {
+    public EventEntity getEvent(String eventTitle) {
         return eventRepository.findEventByTitle(eventTitle);
     }
 
@@ -44,7 +45,7 @@ public class EventService {
     public void createEvent(String title, String eventStart, String eventEnd) {
         var start = LocalDate.parse(eventStart);
         var end = LocalDate.parse(eventEnd);
-        var event = new Event(null, title, start, end, new ArrayList<>(), null, true);
+        var event = new EventEntity(null, title, start, end, null, true);
         eventRepository.save(event);
     }
 
@@ -54,36 +55,81 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    public Map<String, EventData> getAllEventResults() {
+//    public Map<String, EventData> getAllEventResultsOld() {
+//        var events = eventRepository.findAll();
+//        var eventsMap = new HashMap<String, EventData>();
+//
+//        for (var event : events) {
+//            var title = event.getTitle();
+//            List<SummonerAvgEventResult> avgList = null;
+//            List<PlacementCountDto> placementList = null;
+//
+//            if ("AVG".equalsIgnoreCase(title)) {
+//                avgList = getAvgEventResults(title);
+//            } else if ("TOP/BOTTOM".equalsIgnoreCase(title)) {
+//                placementList = getPlacementCountsForEvent(title);
+//            }
+//
+//            eventsMap.put(title, new EventData(avgList, placementList));
+//        }
+//
+//        return eventsMap;
+//    }
+
+    public Map<String, Event> getAllEventResults() {
         var events = eventRepository.findAll();
-        var eventsMap = new HashMap<String, EventData>();
+        var eventsMap = new HashMap<String, Event>();
 
         for (var event : events) {
             var title = event.getTitle();
-            List<SummonerAvgEventResult> avgList = null;
-            List<PlacementCountDto> placementList = null;
 
             if ("AVG".equalsIgnoreCase(title)) {
-                avgList = getAvgEventResults(title);
-            } else if ("TOP/BOTTOM".equalsIgnoreCase(title)) {
-                placementList = getPlacementCountsForEvent(title);
+                eventsMap.put(title, getAvgEventResults(title));
             }
-
-            eventsMap.put(title, new EventData(avgList, placementList));
+            else if ("TOP/BOTTOM".equalsIgnoreCase(title)) {
+                eventsMap.put(title, getPlacementCountsForEvent(title));
+            }
         }
 
         return eventsMap;
     }
 
-    private List<SummonerAvgEventResult> getAvgEventResults(String eventTitle) {
+//    private List<SummonerAvgEventResult> getAvgEventResultsOld(String eventTitle) {
+//        var event = this.getEvent(eventTitle);
+//        var participants = this.getParticipants(eventTitle);
+//        var signedSummoners = userRepository.findAll().stream()
+//                .filter(summoner -> participants.contains(summoner.getUsername()))
+//                .toList();
+//
+//        return signedSummoners.stream()
+//                .map(summoner -> {
+//                    var validMatches = getMatchDetailsBetweenTime(
+//                            summoner.getMatchHistory(),
+//                            event.getStart(),
+//                            event.getEnd());
+//
+//                    var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
+//
+//                    return SummonerMapper.summonerToResultDto(
+//                            summoner,
+//                            calculateAvgPlacementForEvent(validRankedPlacements),
+//                            validRankedPlacements.size(),
+//                            event);
+//                })
+//                .toList();
+//    }
+
+    private AvgEvent getAvgEventResults(String eventTitle) {
         var event = this.getEvent(eventTitle);
         var participants = this.getParticipants(eventTitle);
         var signedSummoners = userRepository.findAll().stream()
                 .filter(summoner -> participants.contains(summoner.getUsername()))
                 .toList();
 
-        return signedSummoners.stream()
-                .map(summoner -> {
+        var avgEvent = new AvgEvent(eventTitle, event.getStart(), event.getEnd(), new ArrayList<>());
+
+        signedSummoners
+                .forEach(summoner -> {
                     var validMatches = getMatchDetailsBetweenTime(
                             summoner.getMatchHistory(),
                             event.getStart(),
@@ -91,16 +137,15 @@ public class EventService {
 
                     var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
 
-                    return SummonerMapper.summonerToResultDto(
-                            summoner,
-                            calculateAvgPlacementForEvent(validRankedPlacements),
+                    avgEvent.getAvgEventResults().add(new AvgEventResult(
+                            summoner.getUsername(),
                             validRankedPlacements.size(),
-                            event);
-                })
-                .toList();
+                            calculateAvgPlacementForEvent(validRankedPlacements)));
+                });
+        return avgEvent;
     }
 
-    public List<PlacementCountDto> getPlacementCountsForEvent(String eventTitle) {
+    public List<PlacementCountDto> getPlacementCountsForEventOld(String eventTitle) {
         var event = this.getEvent(eventTitle);
         var participants = getParticipants(eventTitle);
         var signedSummoners = userRepository.findAll().stream()
@@ -127,6 +172,38 @@ public class EventService {
                             new EventDto(event.getTitle(), event.getStart(), event.getEnd(), event.getParticipants()));
                 })
                 .toList();
+    }
+
+    public PlacementEvent getPlacementCountsForEvent(String eventTitle) {
+        var event = this.getEvent(eventTitle);
+        var participants = getParticipants(eventTitle);
+        var signedSummoners = userRepository.findAll().stream()
+                .filter(summoner -> participants.contains(summoner.getUsername()))
+                .toList();
+
+        var placementEvent = new PlacementEvent(eventTitle, event.getStart(), event.getEnd(), new ArrayList<>());
+
+        signedSummoners
+                .forEach(summoner -> {
+                    var validMatches = getMatchDetailsBetweenTime(
+                            summoner.getMatchHistory(),
+                            event.getStart(),
+                            event.getEnd()
+                    );
+
+                    var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
+                    long topPlacementCount = getTopPlacementCount(validRankedPlacements);
+                    long bottomPlacementCount = getBottomPlacementCount(validRankedPlacements);
+
+                    placementEvent.getPlacementEventResults().add(new PlacementEventResult(
+                            summoner.getUsername(),
+                            validRankedPlacements.size(),
+                            topPlacementCount,
+                            bottomPlacementCount
+                    ));
+                });
+
+        return placementEvent;
     }
 
     private List<String> getMatchDetailsBetweenTime(List<String> matchId, LocalDate start, LocalDate end) {

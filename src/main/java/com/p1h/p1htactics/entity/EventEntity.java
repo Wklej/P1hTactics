@@ -1,6 +1,5 @@
 package com.p1h.p1htactics.entity;
 
-import com.p1h.p1htactics.dto.SummonerAvgEventResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,12 +13,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Event {
+public class EventEntity {
     @Id String id;
     String title;
     LocalDate start;
     LocalDate end;
     List<String> participants;
-    List<SummonerAvgEventResult> finalResults;
     boolean active;
 }

@@ -3,6 +3,7 @@ package com.p1h.p1htactics.controller;
 import com.p1h.p1htactics.dto.EventData;
 import com.p1h.p1htactics.dto.SignUpDto;
 import com.p1h.p1htactics.dto.SummonerAvgEventResult;
+import com.p1h.p1htactics.events.Event;
 import com.p1h.p1htactics.service.EventService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,13 @@ public class EventController {
         eventService.addParticipantToEvent(signUpDto.title(), signUpDto.username());
     }
 
+//    @GetMapping("/api/getEventResults")
+//    public Map<String, EventData> getEventResultsOld() {
+//        return eventService.getAllEventResultsOld();
+//    }
+
     @GetMapping("/api/getEventResults")
-    public Map<String, EventData> getEventResults() {
+    public Map<String, Event> getEventResults() {
         return eventService.getAllEventResults();
     }
 }
