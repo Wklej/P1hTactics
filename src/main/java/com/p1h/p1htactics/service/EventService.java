@@ -1,15 +1,10 @@
 package com.p1h.p1htactics.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.p1h.p1htactics.dto.EventData;
-import com.p1h.p1htactics.dto.EventDto;
-import com.p1h.p1htactics.dto.PlacementCountDto;
-import com.p1h.p1htactics.dto.SummonerAvgEventResult;
 import com.p1h.p1htactics.entity.EventEntity;
 import com.p1h.p1htactics.entity.Match;
 import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.events.*;
-import com.p1h.p1htactics.mapper.SummonerMapper;
 import com.p1h.p1htactics.repository.EventRepository;
 import com.p1h.p1htactics.repository.MatchRepository;
 import com.p1h.p1htactics.repository.UserRepository;
@@ -55,27 +50,6 @@ public class EventService {
         eventRepository.save(event);
     }
 
-//    public Map<String, EventData> getAllEventResultsOld() {
-//        var events = eventRepository.findAll();
-//        var eventsMap = new HashMap<String, EventData>();
-//
-//        for (var event : events) {
-//            var title = event.getTitle();
-//            List<SummonerAvgEventResult> avgList = null;
-//            List<PlacementCountDto> placementList = null;
-//
-//            if ("AVG".equalsIgnoreCase(title)) {
-//                avgList = getAvgEventResults(title);
-//            } else if ("TOP/BOTTOM".equalsIgnoreCase(title)) {
-//                placementList = getPlacementCountsForEvent(title);
-//            }
-//
-//            eventsMap.put(title, new EventData(avgList, placementList));
-//        }
-//
-//        return eventsMap;
-//    }
-
     public Map<String, Event> getAllEventResults() {
         var events = eventRepository.findAll();
         var eventsMap = new HashMap<String, Event>();
@@ -93,31 +67,6 @@ public class EventService {
 
         return eventsMap;
     }
-
-//    private List<SummonerAvgEventResult> getAvgEventResultsOld(String eventTitle) {
-//        var event = this.getEvent(eventTitle);
-//        var participants = this.getParticipants(eventTitle);
-//        var signedSummoners = userRepository.findAll().stream()
-//                .filter(summoner -> participants.contains(summoner.getUsername()))
-//                .toList();
-//
-//        return signedSummoners.stream()
-//                .map(summoner -> {
-//                    var validMatches = getMatchDetailsBetweenTime(
-//                            summoner.getMatchHistory(),
-//                            event.getStart(),
-//                            event.getEnd());
-//
-//                    var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
-//
-//                    return SummonerMapper.summonerToResultDto(
-//                            summoner,
-//                            calculateAvgPlacementForEvent(validRankedPlacements),
-//                            validRankedPlacements.size(),
-//                            event);
-//                })
-//                .toList();
-//    }
 
     private AvgEvent getAvgEventResults(String eventTitle) {
         var event = this.getEvent(eventTitle);
@@ -145,36 +94,7 @@ public class EventService {
         return avgEvent;
     }
 
-    public List<PlacementCountDto> getPlacementCountsForEventOld(String eventTitle) {
-        var event = this.getEvent(eventTitle);
-        var participants = getParticipants(eventTitle);
-        var signedSummoners = userRepository.findAll().stream()
-                .filter(summoner -> participants.contains(summoner.getUsername()))
-                .toList();
-
-        return signedSummoners.stream()
-                .map(summoner -> {
-                    var validMatches = getMatchDetailsBetweenTime(
-                            summoner.getMatchHistory(),
-                            event.getStart(),
-                            event.getEnd()
-                    );
-
-                    var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
-                    long topPlacementCount = getTopPlacementCount(validRankedPlacements);
-                    long bottomPlacementCount = getBottomPlacementCount(validRankedPlacements);
-
-                    return new PlacementCountDto(
-                            summoner.getUsername(),
-                            topPlacementCount,
-                            bottomPlacementCount,
-                            validRankedPlacements.size(),
-                            new EventDto(event.getTitle(), event.getStart(), event.getEnd(), event.getParticipants()));
-                })
-                .toList();
-    }
-
-    public PlacementEvent getPlacementCountsForEvent(String eventTitle) {
+    private PlacementEvent getPlacementCountsForEvent(String eventTitle) {
         var event = this.getEvent(eventTitle);
         var participants = getParticipants(eventTitle);
         var signedSummoners = userRepository.findAll().stream()
