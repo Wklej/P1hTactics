@@ -68,14 +68,14 @@ public class EventService {
         return eventsMap;
     }
 
-    private AvgEvent getAvgEventResults(String eventTitle) {
+    private Event getAvgEventResults(String eventTitle) {
         var event = this.getEvent(eventTitle);
         var participants = this.getParticipants(eventTitle);
         var signedSummoners = userRepository.findAll().stream()
                 .filter(summoner -> participants.contains(summoner.getUsername()))
                 .toList();
 
-        var avgEvent = new AvgEvent(eventTitle, event.getStart(), event.getEnd(), new ArrayList<>());
+        var avgEvent = new Event(eventTitle, event.getStart(), event.getEnd(), new ArrayList<>());
 
         signedSummoners
                 .forEach(summoner -> {
@@ -86,7 +86,7 @@ public class EventService {
 
                     var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
 
-                    avgEvent.getAvgEventResults().add(new AvgEventResult(
+                    avgEvent.getEventResults().add(new AvgEventResult(
                             summoner.getUsername(),
                             validRankedPlacements.size(),
                             calculateAvgPlacementForEvent(validRankedPlacements)));
@@ -94,14 +94,14 @@ public class EventService {
         return avgEvent;
     }
 
-    private PlacementEvent getPlacementCountsForEvent(String eventTitle) {
+    private Event getPlacementCountsForEvent(String eventTitle) {
         var event = this.getEvent(eventTitle);
         var participants = getParticipants(eventTitle);
         var signedSummoners = userRepository.findAll().stream()
                 .filter(summoner -> participants.contains(summoner.getUsername()))
                 .toList();
 
-        var placementEvent = new PlacementEvent(eventTitle, event.getStart(), event.getEnd(), new ArrayList<>());
+        var placementEvent = new Event(eventTitle, event.getStart(), event.getEnd(), new ArrayList<>());
 
         signedSummoners
                 .forEach(summoner -> {
@@ -115,7 +115,7 @@ public class EventService {
                     long topPlacementCount = getTopPlacementCount(validRankedPlacements);
                     long bottomPlacementCount = getBottomPlacementCount(validRankedPlacements);
 
-                    placementEvent.getPlacementEventResults().add(new PlacementEventResult(
+                    placementEvent.getEventResults().add(new PlacementEventResult(
                             summoner.getUsername(),
                             validRankedPlacements.size(),
                             topPlacementCount,

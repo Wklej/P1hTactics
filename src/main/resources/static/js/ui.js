@@ -45,7 +45,7 @@ function createEvents(events, currentLoggedUser) {
 
 function createEvent(eventResults, currentLoggedUser) {
     const eventName = eventResults.title
-    const results = eventName === "avg" ? eventResults.avgEventResults : eventResults.placementEventResults
+    const results = eventResults.eventResults
     const isSignedUp = eventResults.length !== 0
         ? results.map(result => result.summonerName).includes(currentLoggedUser)
         : false
