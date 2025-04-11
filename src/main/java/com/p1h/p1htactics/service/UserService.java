@@ -90,7 +90,8 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean userExist(String gameName, String tag) {
-        return getSummonerBy(gameName, tag).isPresent();
+        var summoner = getSummonerBy(gameName, tag);
+        return summoner.isPresent() && summoner.get().getPassword() != null;
     }
 
     public List<Summoner> getAllSummoners() {
