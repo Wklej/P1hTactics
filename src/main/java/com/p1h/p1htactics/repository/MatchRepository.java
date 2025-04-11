@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface MatchRepository extends MongoRepository<Match, String> {
-    List<Match> findByMatchIdInAndGameTimeBetween(List<String> matchId, LocalDateTime start, LocalDateTime end);
+    List<Match> findByMatchIdInAndGameTimeBetweenAndSummonerName(List<String> matchId, LocalDateTime start, LocalDateTime end, String summonerName);
     Optional<Match> findByMatchIdAndSummonerNameAndGameModeAndSet(String matchId, String summonerName, String gameMode, String set);
 }

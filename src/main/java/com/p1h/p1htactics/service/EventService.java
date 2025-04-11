@@ -82,7 +82,11 @@ public class EventService {
                     var validMatches = getMatchDetailsBetweenTime(
                             summoner.getMatchHistory(),
                             event.getStart(),
-                            event.getEnd());
+                            event.getEnd(),
+                            summoner.getGameName());
+
+                    // need to filter out OR db return by summonerName filter also
+                    //validMatches.stream().distinct().toList();
 
                     var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
 
@@ -108,7 +112,8 @@ public class EventService {
                     var validMatches = getMatchDetailsBetweenTime(
                             summoner.getMatchHistory(),
                             event.getStart(),
-                            event.getEnd()
+                            event.getEnd(),
+                            summoner.getGameName()
                     );
 
                     var validRankedPlacements = getValidRankedPlacements(validMatches, summoner);
@@ -126,10 +131,10 @@ public class EventService {
         return placementEvent;
     }
 
-    private List<String> getMatchDetailsBetweenTime(List<String> matchId, LocalDate start, LocalDate end) {
+    private List<String> getMatchDetailsBetweenTime(List<String> matchId, LocalDate start, LocalDate end, String summonerName) {
         var eventStart = LocalDateTime.of(start, LocalTime.MIN);
         var eventEnd = LocalDateTime.of(end, LocalTime.MIN);
-        return matchRepository.findByMatchIdInAndGameTimeBetween(matchId, eventStart, eventEnd).stream()
+        return matchRepository.findByMatchIdInAndGameTimeBetweenAndSummonerName(matchId, eventStart, eventEnd, summonerName).stream()
                 .map(Match::getDetails)
                 .toList();
     }
