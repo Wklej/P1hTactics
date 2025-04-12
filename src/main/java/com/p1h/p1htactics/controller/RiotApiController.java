@@ -1,11 +1,13 @@
 package com.p1h.p1htactics.controller;
 
+import com.p1h.p1htactics.dto.Duo;
 import com.p1h.p1htactics.dto.SummonerRankingDto;
 import com.p1h.p1htactics.service.RiotApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping
@@ -36,6 +38,11 @@ public class RiotApiController {
     @GetMapping("/api/getRanking/{selectedSet}/{selectedMode}")
     public List<SummonerRankingDto> getRanking(@PathVariable String selectedSet, @PathVariable String selectedMode) {
         return riotApiService.getRankings(selectedSet, selectedMode);
+    }
+
+    @GetMapping("api/ranking/bestDuo/{set}")
+    public Map<Duo, Double> getBestDuoRanking(@PathVariable String set) {
+        return riotApiService.getBestDuo(set);
     }
 
 }

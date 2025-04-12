@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.p1h.p1htactics.dto.RankedStatsDto;
-import com.p1h.p1htactics.dto.SummonerRankingDto;
-import com.p1h.p1htactics.dto.SummonerRankingStats;
+import com.p1h.p1htactics.dto.*;
 import com.p1h.p1htactics.entity.Match;
 import com.p1h.p1htactics.entity.Summoner;
 import com.p1h.p1htactics.mapper.SummonerMapper;
@@ -20,10 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -92,22 +88,49 @@ public class RiotApiService {
     }
 
     public List<SummonerRankingDto> getRankings(String selectedSet, String selectedMode) {
-        var currentLoggedSummoner = userRepository.findByUsername(UserUtils.getCurrentUsername()).orElseThrow();
-        var friends = Optional.ofNullable(currentLoggedSummoner.getFriends())
-                .orElse(List.of())
-                .stream()
-                .map(friendDto -> userRepository.findSummonerByGameNameAndTag(friendDto.gameName(), friendDto.tag()))
-                .flatMap(Optional::stream)
-                .toList();
-        var summonersToGetRankingFor = Stream.concat(Stream.of(currentLoggedSummoner), friends.stream())
-                .map(SummonerMapper::summonerToSummonerDto)
-                .toList();
-
+        var summonersToGetRankingFor = getCurrentUserAndFriendsMapped(SummonerMapper::summonerToSummonerDto);
         return summonersToGetRankingFor.stream()
                 .map(summonerDto -> SummonerMapper.summonerDtoToSummonerRankingDto(
                         summonerDto,
                         getAvgPlacementBySet(summonerDto.gameName(), summonerDto.tag(), selectedMode, selectedSet, 1000)))
                 .toList();
+    }
+
+    public Map<Duo, Double> getBestDuo(String set) {
+        var summonersToGetRankingFor = getCurrentUserAndFriendsMapped(Summoner::getGameName);
+        var doubleUpMatches = matchRepository.findBySummonerNameInAndGameModeAndSet(summonersToGetRankingFor, "1160", set);
+
+        Map<Duo, List<Integer>> duoMap = new HashMap<>();
+
+        var matchesGroupedByMatchId = doubleUpMatches.stream()
+                .collect(Collectors.groupingBy(Match::getMatchId));
+
+        for (var match : matchesGroupedByMatchId.values()) {
+            var m1 = match.get(0);
+            var m2 = match.get(1);
+
+            var namesSorted = Stream.of(m1.getSummonerName(), m2.getSummonerName()).sorted().toList();
+            var duo = new Duo(namesSorted.get(0), namesSorted.get(1));
+            var duoPlacement = getDoubleUpPlacement(m1.getPlacement());
+
+            duoMap.computeIfAbsent(duo, k -> new ArrayList<>()).add(duoPlacement);
+        }
+
+        Map<Duo, Double> duoAvgMap = duoMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            var avg = entry.getValue().stream()
+                                    .mapToInt(Integer::intValue)
+                                    .average()
+                                    .orElse(0.0);
+                            return BigDecimal.valueOf(avg)
+                                    .setScale(2, RoundingMode.HALF_UP)
+                                    .doubleValue();
+                        }
+                ));
+
+        return duoAvgMap;
     }
 
     public Optional<Integer> getPlacement(String gameMode, Summoner summoner, String details) throws JsonProcessingException {
@@ -190,5 +213,20 @@ public class RiotApiService {
             case 5, 6 -> 3;
             default   -> 4;
         };
+    }
+
+    private <R> List<R> getCurrentUserAndFriendsMapped(Function<Summoner, R> summonerMapper) {
+        var currentLoggedSummoner = userRepository.findByUsername(UserUtils.getCurrentUsername()).orElseThrow();
+
+        var friends = Optional.ofNullable(currentLoggedSummoner.getFriends())
+                .orElse(List.of())
+                .stream()
+                .map(friendDto -> userRepository.findSummonerByGameNameAndTag(friendDto.gameName(), friendDto.tag()))
+                .flatMap(Optional::stream)
+                .toList();
+
+        return Stream.concat(Stream.of(currentLoggedSummoner), friends.stream())
+                .map(summonerMapper)
+                .toList();
     }
 }
