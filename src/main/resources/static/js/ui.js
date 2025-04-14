@@ -65,8 +65,13 @@ function createRankingDuo(ranking, mode) {
         averageColumn.classList.add('column-item')
         averageColumn.textContent = result.avg
 
+        const gamesColumn = document.createElement('span')
+        gamesColumn.classList.add('column-item')
+        gamesColumn.textContent = result.placements.length
+
         row.appendChild(duoColumn)
         row.appendChild(averageColumn)
+        row.appendChild(gamesColumn)
         rankingTable.appendChild(row)
     })
 
@@ -82,8 +87,12 @@ function createRankingDuoHeader() {
     const avgSpan = document.createElement('span')
     avgSpan.classList.add('column-item')
     avgSpan.textContent = "Average Placement"
+    const gamesSpan = document.createElement('span')
+    gamesSpan.classList.add('column-item')
+    gamesSpan.textContent = "Games"
     header.appendChild(duoSpan)
     header.appendChild(avgSpan)
+    header.appendChild(gamesSpan)
     return header
 }
 
