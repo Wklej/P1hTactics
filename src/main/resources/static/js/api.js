@@ -110,6 +110,10 @@ function loadRanked(selectedSet, selectedMode) {
     fetch(`http://${hostname}/api/getRanking/${selectedSet}/${selectedMode}`)
         .then(res => res.json())
         .then(ranking => createRanking(ranking))
+
+    fetch(`http://${hostname}/api/ranking/bestDuo/${selectedSet}`)
+        .then(res => res.json())
+        .then(results => createRankingDuo(results, selectedMode))
 }
 
 async function loadEvent() {

@@ -1,3 +1,5 @@
 package com.p1h.p1htactics.dto;
 
-public record DuoResults(int placement, int games) {}
+import java.util.List;
+
+public record DuoResults(Duo duo, List<Integer> placements, double avg) {}

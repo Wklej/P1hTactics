@@ -39,6 +39,54 @@ function createRanking(ranking) {
     })
 }
 
+function createRankingDuo(ranking, mode) {
+    const rankingSection = document.getElementById('ranking-section')
+    const rankingTable = document.createElement('div')
+    rankingTable.classList.add("ranking-table")
+    mode === "1160" ? rankingTable.classList.remove("hidden") : rankingTable.classList.add("hidden")
+    rankingTable.id = "ranking-table-duo"
+    const header = createRankingDuoHeader()
+    rankingTable.appendChild(header)
+
+    const alreadyCreatedTable = document.getElementById("ranking-table-duo")
+    if (alreadyCreatedTable !== null) {
+        alreadyCreatedTable.remove()
+    }
+
+    ranking.forEach(result => {
+        const row = document.createElement('div')
+        row.classList.add('ranking-row-duo')
+
+        const duoColumn = document.createElement('span')
+        duoColumn.classList.add('column-item')
+        duoColumn.textContent = `${result.duo.summoner1} and ${result.duo.summoner2}`
+
+        const averageColumn = document.createElement('span')
+        averageColumn.classList.add('column-item')
+        averageColumn.textContent = result.avg
+
+        row.appendChild(duoColumn)
+        row.appendChild(averageColumn)
+        rankingTable.appendChild(row)
+    })
+
+    rankingSection.appendChild(rankingTable)
+}
+
+function createRankingDuoHeader() {
+    const header = document.createElement('div')
+    header.classList.add('ranking-header')
+    const duoSpan = document.createElement('span')
+    duoSpan.classList.add('column-item')
+    duoSpan.textContent = "Duo"
+    const avgSpan = document.createElement('span')
+    avgSpan.classList.add('column-item')
+    avgSpan.textContent = "Average Placement"
+    header.appendChild(duoSpan)
+    header.appendChild(avgSpan)
+    return header
+}
+
 function createEvents(events, currentLoggedUser) {
     Object.values(events).forEach(eventResults => createEvent(eventResults, currentLoggedUser))
 }

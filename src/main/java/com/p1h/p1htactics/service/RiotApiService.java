@@ -96,7 +96,7 @@ public class RiotApiService {
                 .toList();
     }
 
-    public Map<Duo, Double> getBestDuo(String set) {
+    public List<DuoResults> getBestDuo(String set) {
         var summonersToGetRankingFor = getCurrentUserAndFriendsMapped(Summoner::getGameName);
         var doubleUpMatches = matchRepository.findBySummonerNameInAndGameModeAndSet(summonersToGetRankingFor, "1160", set);
 
@@ -116,21 +116,22 @@ public class RiotApiService {
             duoMap.computeIfAbsent(duo, k -> new ArrayList<>()).add(duoPlacement);
         }
 
-        Map<Duo, Double> duoAvgMap = duoMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> {
-                            var avg = entry.getValue().stream()
-                                    .mapToInt(Integer::intValue)
-                                    .average()
-                                    .orElse(0.0);
-                            return BigDecimal.valueOf(avg)
-                                    .setScale(2, RoundingMode.HALF_UP)
-                                    .doubleValue();
-                        }
-                ));
+        var duoResultsList = duoMap.entrySet().stream()
+                .map(entry -> {
+                    var duo = entry.getKey();
+                    var placements = entry.getValue();
+                    var avg = entry.getValue().stream()
+                            .mapToInt(Integer::intValue)
+                            .average()
+                            .orElse(0.0);
+                    avg = BigDecimal.valueOf(avg)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .doubleValue();
+                    return new DuoResults(duo, placements, avg);
+                })
+                .toList();
 
-        return duoAvgMap;
+        return duoResultsList;
     }
 
     public Optional<Integer> getPlacement(String gameMode, Summoner summoner, String details) throws JsonProcessingException {
