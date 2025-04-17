@@ -158,6 +158,17 @@ public class RiotApiService {
         return getRankedStats(accountStatsResponse);
     }
 
+    public List<MatchHistoryDto> getMatchHistory(String summonerName) {
+        var matchesList = matchRepository.findTop10BySummonerNameOrderByGameTimeDesc(summonerName);
+        return matchesList.stream()
+                .map(match -> new MatchHistoryDto(
+                        SummonerMapper.gameModeMapper(match.getGameMode()),
+                        match.getPlacement(),
+                        match.getTraits(),
+                        match.getGameTime().toLocalDate()))
+                .toList();
+    }
+
     private String getSummonerId(String accountInfo) {
         try {
             return objectMapper.readTree(accountInfo).get("id").asText();

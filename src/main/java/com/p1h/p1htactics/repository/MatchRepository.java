@@ -13,4 +13,5 @@ public interface MatchRepository extends MongoRepository<Match, String> {
     List<Match> findByMatchIdInAndGameTimeBetweenAndSummonerName(List<String> matchId, LocalDateTime start, LocalDateTime end, String summonerName);
     Optional<Match> findByMatchIdAndSummonerNameAndGameModeAndSet(String matchId, String summonerName, String gameMode, String set);
     List<Match> findBySummonerNameInAndGameModeAndSet(List<String> summonerNames, String gameMode, String set);
+    List<Match> findTop10BySummonerNameOrderByGameTimeDesc(String summonerName);
 }
