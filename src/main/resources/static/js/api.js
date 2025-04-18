@@ -35,9 +35,12 @@ function registerUser() {
 }
 
 function getUsers() {
-    fetch(`http://${hostname}/api/getUsers`)
+    fetch(`http://${hostname}/api/getCurrentUserAndFriends`)
         .then(res => res.json())
-        .then(users => appendUsers(users))
+        .then(users => {
+            appendUsers(users)
+            appendUsersToHistorySelect(users)
+        })
 }
 
 async function getUser(gameName) {

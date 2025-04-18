@@ -52,11 +52,9 @@ public class UserController {
         }
     }
 
-    @GetMapping("/api/getUsers")
-    public List<SummonerDto> getUsers() {
-        return userService.getAllSummoners().stream()
-                .map(SummonerMapper::summonerToSummonerDto)
-                .toList();
+    @GetMapping("/api/getCurrentUserAndFriends")
+    public List<SummonerDto> getCurrentUserAndFriends() {
+        return userService.getCurrentUserAndFriends();
     }
 
     @GetMapping("/api/getUser/{gameName}")

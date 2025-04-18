@@ -17,6 +17,7 @@
             <button class="tab-button" data-target="addFriend-section">Add friend</button>
             <button class="tab-button" data-target="ranking-section">Ranking</button>
             <button class="tab-button" data-target="event-section">Event</button>
+            <button class="tab-button" data-target="history-section">Match history</button>
         </div>
 
         <div class="tab-content" id="tab-content">
@@ -86,6 +87,22 @@
                 </div>
             </div>
             <div class="container hidden" id="event-section"></div>
+            <div class="container hidden" id="history-section">
+                <div class="form-group">
+                    <label for="userHistorySelect">Select Set:</label>
+                    <select id="userHistorySelect" onchange="loadHistory(this.value)">
+                        <option value="">-- Select User --</option>
+                    </select>
+                </div>
+                <div class="ranking-table" id="history-table">
+                    <div class="ranking-header">
+                        <span class="column-item">Game mode</span>
+                        <span class="column-item">Placement</span>
+                        <span class="column-item">Traits</span>
+                        <span class="column-item">Date</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>

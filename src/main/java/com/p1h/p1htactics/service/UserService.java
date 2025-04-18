@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -147,6 +149,21 @@ public class UserService implements UserDetailsService {
     public boolean summonerExist(String gameName, String tag) {
         var statusCode = riotApiService.getAccountByRiotIdStatusCode(gameName, tag);
         return statusCode == 200;
+    }
+
+    public List<SummonerDto> getCurrentUserAndFriends() {
+        var currentLoggedSummoner = userRepository.findByUsername(UserUtils.getCurrentUsername()).orElseThrow();
+
+        var friends = Optional.ofNullable(currentLoggedSummoner.getFriends())
+                .orElse(List.of())
+                .stream()
+                .map(friendDto -> userRepository.findSummonerByGameNameAndTag(friendDto.gameName(), friendDto.tag()))
+                .flatMap(Optional::stream)
+                .toList();
+
+        return Stream.concat(Stream.of(currentLoggedSummoner), friends.stream())
+                .map(SummonerMapper::summonerToSummonerDto)
+                .toList();
     }
 
     private Summoner createSummoner(String username, String password, String gameName, String tag, String puuId, List<String> matchIds) {

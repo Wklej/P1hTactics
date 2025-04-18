@@ -9,6 +9,17 @@ function appendUsers(users) {
     })
 }
 
+function appendUsersToHistorySelect(users) {
+    const userSelect = document.getElementById('userHistorySelect')
+
+    users.forEach(user => {
+        const option = document.createElement('option')
+        option.value = user.gameName
+        option.textContent = user.gameName
+        userSelect.appendChild(option)
+    })
+}
+
 function showResult(avg) {
     const resultDiv = document.getElementById("result")
     resultDiv.innerText = avg
@@ -316,4 +327,41 @@ function createUserInfo(info) {
     }
 
     rank.innerHTML = rankContent
+}
+
+function createMatchHistoryTable(history) {
+    const table = document.getElementById('history-table')
+    // Clear existing rows (except header)
+    document.querySelectorAll('.ranking-row-history')
+        .forEach(row => row.remove())
+
+    // Populate table with fetched data
+    history.forEach(match => {
+        const row = document.createElement('div')
+        row.classList.add('ranking-row-history')
+
+        const gameModeColumn = document.createElement('span')
+        gameModeColumn.classList.add('column-item')
+        gameModeColumn.textContent = match.gameMode
+
+        const placementColumn = document.createElement('span')
+        placementColumn.classList.add('column-item')
+        placementColumn.textContent = match.placement
+
+        const traitsColumn = document.createElement('span')
+        traitsColumn.classList.add('column-item')
+        let traitsContent = ''
+        match.traits.forEach(trait => traitsContent += `${trait.name}<br>`)
+        traitsColumn.innerHTML = traitsContent
+
+        const dateColumn = document.createElement('span')
+        dateColumn.classList.add('column-item')
+        dateColumn.textContent = match.date
+
+        row.appendChild(gameModeColumn)
+        row.appendChild(placementColumn)
+        row.appendChild(traitsColumn)
+        row.appendChild(dateColumn)
+        table.appendChild(row)
+    })
 }
