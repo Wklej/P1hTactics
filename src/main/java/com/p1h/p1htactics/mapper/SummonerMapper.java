@@ -23,7 +23,7 @@ public class SummonerMapper {
     public static String gameModeMapper(String gameMode) {
         return switch (gameMode) {
             case "1090" -> "Normal";
-            case "1010" -> "Ranked";
+            case "1100" -> "Ranked";
             case "1160" -> "Double Up";
             case "1130" -> "Hyper Roll";
             default -> "UNKNOWN";
