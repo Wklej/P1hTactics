@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27018:27017" # host:container
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  p1htactics:
+    image: fwawrzyniak/p1htactics:latest
+    container_name: p1htactics
+#    build:
+#      context: ./p1htactics
+#      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/p1htactics-db
+      - AWS_REGION=eu-central-1
+      - AWS_ACCESS_KEY_ID=your_aws_access_key_id
+      - AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  matchscrapper:
+    image: fwawrzyniak/matchscrapper:latest
+    container_name: matchscrapper
+#    build:
+#      context: ./matchscrapper
+#      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/p1htactics-db
+      - AWS_REGION=eu-central-1
+      - AWS_ACCESS_KEY_ID=your_aws_access_key_id
+      - AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
